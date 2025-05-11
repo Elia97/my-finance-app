@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String                  @id @default(uuid())
+  name                   String
+  email                  String                  @unique
+  password               String
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  accounts               Account[]
+  investments            Investment[]
+  investmentTransactions InvestmentTransaction[]
+  transactions           Transaction[]
+}
+
+model Account {
+  id                      String        @id @default(uuid())
+  name                    String
+  type                    AccountType
+  balance                 Decimal       @default(0.0)
+  currency                String        @default("EUR")
+  userId                  String
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  user                    User          @relation(fields: [userId], references: [id])
+  destinationTransactions Transaction[] @relation("DestinationAccount")
+  sourceTransactions      Transaction[] @relation("SourceAccount")
+}
+
+model Transaction {
+  id                   String          @id @default(uuid())
+  type                 TransactionType
+  amount               Decimal
+  description          String?
+  date                 DateTime        @default(now())
+  sourceAccountId      String
+  destinationAccountId String?
+  userId               String
+  destinationAccount   Account?        @relation("DestinationAccount", fields: [destinationAccountId], references: [id])
+  sourceAccount        Account         @relation("SourceAccount", fields: [sourceAccountId], references: [id])
+  user                 User            @relation(fields: [userId], references: [id])
+}
+
+model Investment {
+  id            String                  @id @default(uuid())
+  name          String
+  type          TransactionType
+  quantity      Decimal
+  purchasePrice Decimal
+  currentPrice  Decimal
+  currency      String                  @default("EUR")
+  userId        String
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+  user          User                    @relation(fields: [userId], references: [id])
+  transactions  InvestmentTransaction[]
+}
+
+model InvestmentTransaction {
+  id           String          @id @default(uuid())
+  type         TransactionType
+  amount       Decimal
+  date         DateTime        @default(now())
+  investmentId String
+  userId       String
+  investment   Investment      @relation(fields: [investmentId], references: [id])
+  user         User            @relation(fields: [userId], references: [id])
+}
+
+enum AccountType {
+  CHECKING
+  INVESTMENT
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  DEPOSIT
+  WITHDRAWAL
+  BUY
+  SELL
+}
