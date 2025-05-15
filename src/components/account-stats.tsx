@@ -7,15 +7,11 @@ import {
 } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowDownRight, ArrowUpRight, RefreshCw } from "lucide-react";
+import { getAccountStats } from "@/lib/queries/account-stats";
 
-export function AccountStats() {
-  // Dati di esempio
-  const stats = {
-    totalBalance: 11201.07,
-    totalIncome: 2325.75,
-    totalExpenses: 1450.25,
-    totalTransfers: 500,
-  };
+export async function AccountStats() {
+  const { totalBalance, totalIncome, totalExpenses, totalTransfers } =
+    await getAccountStats();
 
   return (
     <Card>
@@ -30,7 +26,7 @@ export function AccountStats() {
               Patrimonio Totale
             </div>
             <div className="mt-1 text-2xl font-bold">
-              {formatCurrency(stats.totalBalance)}
+              {formatCurrency(Number(totalBalance))}
             </div>
           </div>
 
@@ -41,7 +37,7 @@ export function AccountStats() {
                 Entrate
               </div>
               <div className="mt-1 text-lg font-bold text-green-600">
-                {formatCurrency(stats.totalIncome)}
+                {formatCurrency(Number(totalIncome))}
               </div>
             </div>
 
@@ -51,7 +47,7 @@ export function AccountStats() {
                 Uscite
               </div>
               <div className="mt-1 text-lg font-bold text-red-600">
-                {formatCurrency(stats.totalExpenses)}
+                {formatCurrency(Number(totalExpenses))}
               </div>
             </div>
 
@@ -61,7 +57,7 @@ export function AccountStats() {
                 Trasferimenti
               </div>
               <div className="mt-1 text-lg font-bold text-blue-600">
-                {formatCurrency(stats.totalTransfers)}
+                {formatCurrency(Number(totalTransfers))}
               </div>
             </div>
           </div>

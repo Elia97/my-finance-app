@@ -120,3 +120,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Assicurati che il contenuto principale occupi tutta la larghezza disponibile */
+[data-sidebar="sidebar"] + main,
+[data-sidebar="inset"] {
+  @apply w-full;
+}
+
+/* Assicurati che i contenitori all'interno del contenuto principale siano a larghezza piena */
+[data-sidebar="inset"] > div {
+  @apply w-full;
+}

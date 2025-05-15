@@ -6,26 +6,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
 
-// Dati di esempio
-const accounts = [
-  {
-    id: 1,
-    name: "Conto Corrente",
-    balance: 2450.75,
-    type: "checking",
-  },
-  {
-    id: 2,
-    name: "Conto Titoli",
-    balance: 8750.32,
-    type: "savings",
-  },
-];
-
-export function AccountsOverview() {
+export async function AccountsOverview() {
+  const accounts = await prisma.account.findMany();
   const totalBalance = accounts.reduce(
-    (sum, account) => sum + account.balance,
+    (sum, account) => sum + Number(account.balance),
     0
   );
 
@@ -45,13 +31,13 @@ export function AccountsOverview() {
               <div>
                 <div className="font-medium">{account.name}</div>
                 <div className="text-sm text-muted-foreground">
-                  {account.type === "checking"
+                  {account.type === "CHECKING"
                     ? "Conto Corrente"
                     : "Conto Titoli"}
                 </div>
               </div>
               <div className="font-medium">
-                {formatCurrency(account.balance)}
+                {formatCurrency(Number(account.balance))}
               </div>
             </div>
           ))}

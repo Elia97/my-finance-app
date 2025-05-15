@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardContent,
@@ -7,63 +5,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { getLastThreeMonthsStats } from "@/lib/queries/last-three-months-stats";
+import { MonthlyChart } from "./charts/monthly-chart";
 
-// Dati di esempio
-const data = [
-  {
-    name: "Gen",
-    spese: 1200,
-    trasferimenti: 300,
-  },
-  {
-    name: "Feb",
-    spese: 1100,
-    trasferimenti: 300,
-  },
-  {
-    name: "Mar",
-    spese: 1300,
-    trasferimenti: 400,
-  },
-  {
-    name: "Apr",
-    spese: 1150,
-    trasferimenti: 300,
-  },
-  {
-    name: "Mag",
-    spese: 1450,
-    trasferimenti: 500,
-  },
-];
-
-export function MonthlyExpenseChart() {
+export async function MonthlyExpenseChart() {
+  const stats = await getLastThreeMonthsStats();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Andamento Spese</CardTitle>
-        <CardDescription>Spese e trasferimenti mensili</CardDescription>
+        <CardTitle>Andamento Ultimi 3 mesi</CardTitle>
+        <CardDescription>Entrate e uscite mensili</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="spese" name="Spese" fill="#ef4444" />
-            <Bar dataKey="trasferimenti" name="Trasferimenti" fill="#3b82f6" />
-          </BarChart>
-        </ResponsiveContainer>
+        <MonthlyChart data={stats} />
       </CardContent>
     </Card>
   );

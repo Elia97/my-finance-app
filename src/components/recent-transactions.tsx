@@ -9,48 +9,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ArrowDownRight, ArrowUpRight, RefreshCw } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-// Dati di esempio
-const transactions = [
-  {
-    id: 1,
-    description: "Stipendio",
-    amount: 1800,
-    date: new Date("2023-05-01"),
-    type: "income",
-    account: "Conto Corrente",
-    category: "Stipendio",
-  },
-  {
-    id: 2,
-    description: "Supermercato",
-    amount: -85.45,
-    date: new Date("2023-05-03"),
-    type: "expense",
-    account: "Conto Corrente",
-    category: "Alimentari",
-  },
-  {
-    id: 3,
-    description: "Trasferimento a Conto Titoli",
-    amount: -500,
-    date: new Date("2023-05-05"),
-    type: "transfer",
-    account: "Conto Corrente",
-    category: "Trasferimento",
-  },
-  {
-    id: 4,
-    description: "Trasferimento da Conto Corrente",
-    amount: 500,
-    date: new Date("2023-05-05"),
-    type: "transfer",
-    account: "Conto Titoli",
-    category: "Trasferimento",
-  },
-];
+export async function RecentTransactions() {
+  const transactions = await prisma.transaction.findMany({
+    take: 4, // Prende solo le ultime 4
+    orderBy: {
+      date: "desc", // Ordina dalla più recente alla meno recente
+    },
+    include: {
+      sourceAccount: true,
+      destinationAccount: true,
+      user: true,
+      category: true,
+    },
+  });
 
-export function RecentTransactions() {
   return (
     <Card>
       <CardHeader>
@@ -68,16 +42,16 @@ export function RecentTransactions() {
                 <div
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-full",
-                    transaction.type === "income"
+                    transaction.type === "INCOME"
                       ? "bg-green-100"
-                      : transaction.type === "expense"
+                      : transaction.type === "EXPENSE"
                       ? "bg-red-100"
                       : "bg-blue-100"
                   )}
                 >
-                  {transaction.type === "income" ? (
+                  {transaction.type === "INCOME" ? (
                     <ArrowUpRight className={cn("h-5 w-5", "text-green-600")} />
-                  ) : transaction.type === "expense" ? (
+                  ) : transaction.type === "EXPENSE" ? (
                     <ArrowDownRight className={cn("h-5 w-5", "text-red-600")} />
                   ) : (
                     <RefreshCw className={cn("h-5 w-5", "text-blue-600")} />
@@ -86,7 +60,11 @@ export function RecentTransactions() {
                 <div>
                   <div className="font-medium">{transaction.description}</div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDate(transaction.date)} • {transaction.account}
+                    {transaction.destinationAccount
+                      ? `${transaction.sourceAccount.name} • ${transaction.destinationAccount.name}`
+                      : `${formatDate(transaction.date)} • ${
+                          transaction.sourceAccount.name
+                        }`}
                   </div>
                 </div>
               </div>
@@ -94,28 +72,28 @@ export function RecentTransactions() {
                 <div
                   className={cn(
                     "font-medium",
-                    transaction.amount > 0
+                    Number(transaction.amount) > 0
                       ? "text-green-600"
-                      : transaction.type === "transfer"
+                      : transaction.type === "TRANSFER"
                       ? "text-blue-600"
                       : "text-red-600"
                   )}
                 >
-                  {formatCurrency(transaction.amount)}
+                  {formatCurrency(Number(transaction.amount))}
                 </div>
                 <Badge
-                  variant={
-                    transaction.type === "income"
-                      ? "outline"
-                      : transaction.type === "expense"
-                      ? "destructive"
-                      : "secondary"
+                  variant="default"
+                  className={
+                    transaction.type === "INCOME"
+                      ? "bg-green-100 text-green-700"
+                      : transaction.type === "EXPENSE"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-blue-100 text-blue-700"
                   }
-                  className="ml-2"
                 >
-                  {transaction.type === "income"
+                  {transaction.type === "INCOME"
                     ? "Entrata"
-                    : transaction.type === "expense"
+                    : transaction.type === "EXPENSE"
                     ? "Spesa"
                     : "Trasferimento"}
                 </Badge>

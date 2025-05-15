@@ -22,75 +22,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Prisma } from "@prisma/client";
 
-// Dati di esempio
-const transactions = [
-  {
-    id: 1,
-    description: "Stipendio",
-    amount: 1800,
-    date: new Date("2023-05-01"),
-    type: "income",
-    account: "Conto Corrente",
-    category: "Stipendio",
-  },
-  {
-    id: 2,
-    description: "Supermercato",
-    amount: -85.45,
-    date: new Date("2023-05-03"),
-    type: "expense",
-    account: "Conto Corrente",
-    category: "Alimentari",
-  },
-  {
-    id: 3,
-    description: "Trasferimento a Conto Titoli",
-    amount: -500,
-    date: new Date("2023-05-05"),
-    type: "transfer",
-    account: "Conto Corrente",
-    category: "Trasferimento",
-  },
-  {
-    id: 4,
-    description: "Trasferimento da Conto Corrente",
-    amount: 500,
-    date: new Date("2023-05-05"),
-    type: "transfer",
-    account: "Conto Titoli",
-    category: "Trasferimento",
-  },
-  {
-    id: 5,
-    description: "Bolletta Luce",
-    amount: -75.3,
-    date: new Date("2023-05-10"),
-    type: "expense",
-    account: "Conto Corrente",
-    category: "Bollette",
-  },
-  {
-    id: 6,
-    description: "Abbonamento Palestra",
-    amount: -45,
-    date: new Date("2023-05-15"),
-    type: "expense",
-    account: "Conto Corrente",
-    category: "Salute",
-  },
-  {
-    id: 7,
-    description: "Dividendi",
-    amount: 25.75,
-    date: new Date("2023-05-20"),
-    type: "income",
-    account: "Conto Titoli",
-    category: "Investimenti",
-  },
-];
+type TransactionWithRelations = Prisma.TransactionGetPayload<{
+  include: {
+    user: true;
+    category: true;
+    sourceAccount: true;
+  };
+}>;
 
-export function TransactionsTable() {
+export function TransactionsTable({
+  transactions,
+}: {
+  transactions: TransactionWithRelations[];
+}) {
+  if (!transactions || transactions.length === 0) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-muted-foreground">Nessuna transazione trovata</p>
+      </div>
+    );
+  }
   return (
     <div className="rounded-md border">
       <Table>
@@ -112,25 +65,25 @@ export function TransactionsTable() {
               <TableCell className="font-medium">
                 {transaction.description}
               </TableCell>
-              <TableCell>{transaction.category}</TableCell>
-              <TableCell>{transaction.account}</TableCell>
+              <TableCell>{transaction.category?.name}</TableCell>
+              <TableCell>{transaction.sourceAccount.name}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   <div
                     className={cn(
                       "flex h-7 w-7 items-center justify-center rounded-full",
-                      transaction.type === "income"
+                      transaction.type === "INCOME"
                         ? "bg-green-100"
-                        : transaction.type === "expense"
+                        : transaction.type === "EXPENSE"
                         ? "bg-red-100"
                         : "bg-blue-100"
                     )}
                   >
-                    {transaction.type === "income" ? (
+                    {transaction.type === "INCOME" ? (
                       <ArrowUpRight
                         className={cn("h-4 w-4", "text-green-600")}
                       />
-                    ) : transaction.type === "expense" ? (
+                    ) : transaction.type === "EXPENSE" ? (
                       <ArrowDownRight
                         className={cn("h-4 w-4", "text-red-600")}
                       />
@@ -139,17 +92,18 @@ export function TransactionsTable() {
                     )}
                   </div>
                   <Badge
-                    variant={
-                      transaction.type === "income"
-                        ? "outline"
-                        : transaction.type === "expense"
-                        ? "destructive"
-                        : "secondary"
+                    variant="default"
+                    className={
+                      transaction.type === "INCOME"
+                        ? "bg-green-100 text-green-700"
+                        : transaction.type === "EXPENSE"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-blue-100 text-blue-700"
                     }
                   >
-                    {transaction.type === "income"
+                    {transaction.type === "INCOME"
                       ? "Entrata"
-                      : transaction.type === "expense"
+                      : transaction.type === "EXPENSE"
                       ? "Spesa"
                       : "Trasferimento"}
                   </Badge>
@@ -158,14 +112,14 @@ export function TransactionsTable() {
               <TableCell
                 className={cn(
                   "text-right font-medium",
-                  transaction.amount > 0
+                  Number(transaction.amount) > 0
                     ? "text-green-600"
-                    : transaction.type === "transfer"
+                    : transaction.type === "TRANSFER"
                     ? "text-blue-600"
                     : "text-red-600"
                 )}
               >
-                {formatCurrency(transaction.amount)}
+                {formatCurrency(Number(transaction.amount))}
               </TableCell>
               <TableCell>
                 <DropdownMenu>

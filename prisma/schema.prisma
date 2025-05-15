@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -19,6 +18,7 @@ model User {
   investments            Investment[]
   investmentTransactions InvestmentTransaction[]
   transactions           Transaction[]
+  categories             Category[]
 }
 
 model Account {
@@ -28,6 +28,7 @@ model Account {
   balance                 Decimal       @default(0.0)
   currency                String        @default("EUR")
   userId                  String
+  number                  String?       @unique
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
   user                    User          @relation(fields: [userId], references: [id])
@@ -38,6 +39,8 @@ model Account {
 model Transaction {
   id                   String          @id @default(uuid())
   type                 TransactionType
+  categoryId           String?
+  category             Category?       @relation("CategoryTransactions", fields: [categoryId], references: [id])
   amount               Decimal
   description          String?
   date                 DateTime        @default(now())
@@ -75,6 +78,16 @@ model InvestmentTransaction {
   user         User            @relation(fields: [userId], references: [id])
 }
 
+model Category {
+  id           String        @id @default(uuid())
+  name         String
+  userId       String
+  transactions Transaction[] @relation("CategoryTransactions")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id])
+}
+
 enum AccountType {
   CHECKING
   INVESTMENT
@@ -83,8 +96,7 @@ enum AccountType {
 enum TransactionType {
   INCOME
   EXPENSE
-  DEPOSIT
-  WITHDRAWAL
+  TRANSFER
   BUY
   SELL
 }

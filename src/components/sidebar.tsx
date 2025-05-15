@@ -34,40 +34,45 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <ShadcnSidebar>
-      <SidebarHeader className="border-b">
-        <div className="flex h-16 items-center px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <Wallet className="h-6 w-6" />
-            <span>FinTrack</span>
-          </Link>
-        </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>
-          {navItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href}
-                tooltip={item.name}
-              >
-                <Link href={item.href} className="flex items-center gap-3">
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter className="border-t p-4">
-        <Button variant="outline" className="w-full justify-start gap-2">
-          <LogOut className="h-4 w-4" />
-          <span>Esci</span>
-        </Button>
-      </SidebarFooter>
-      <SidebarRail />
-    </ShadcnSidebar>
+    <div className="relative">
+      <ShadcnSidebar variant="sidebar">
+        <SidebarHeader className="border-b">
+          <div className="flex h-16 items-center px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Wallet className="h-6 w-6" />
+              <span>Gestione Spese</span>
+            </Link>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu className=" px-4 py-2">
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === item.href}
+                  tooltip={item.name}
+                >
+                  <Link
+                    href={item.href}
+                    className="flex items-center gap-3 px-4 py-2"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter className="border-t p-4">
+          <Button variant="outline" className="w-full justify-start gap-2">
+            <LogOut className="h-4 w-4" />
+            <span>Esci</span>
+          </Button>
+        </SidebarFooter>
+        <SidebarRail />
+      </ShadcnSidebar>
+    </div>
   );
 }
