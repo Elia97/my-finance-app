@@ -10,14 +10,14 @@ import { getTransactionSummary } from "@/lib/queries/transaction-summary";
 
 export async function TransactionSummary() {
   const { income, expenses, transfers } = await getTransactionSummary();
-  const balance = Number(income) + Number(expenses);
+  const balance = Number(income) - Number(expenses);
   const currentMonth = new Date().toLocaleDateString("it-IT", {
     month: "long",
     year: "numeric",
   });
 
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader>
         <CardTitle>Riepilogo Mensile</CardTitle>
         <CardDescription>{currentMonth}</CardDescription>

@@ -5,15 +5,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getLastThreeMonthsStats } from "@/lib/queries/last-three-months-stats";
+import { getCurrentYearStats } from "@/lib/queries/current-year-stats";
 import { MonthlyChart } from "./charts/monthly-chart";
 
 export async function MonthlyExpenseChart() {
-  const stats = await getLastThreeMonthsStats();
+  const stats = await getCurrentYearStats();
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader>
-        <CardTitle>Andamento Ultimi 3 mesi</CardTitle>
+        <CardTitle>Andamento Mensile</CardTitle>
         <CardDescription>Entrate e uscite mensili</CardDescription>
       </CardHeader>
       <CardContent>

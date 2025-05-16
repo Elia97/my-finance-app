@@ -26,7 +26,7 @@ export async function RecentTransactions() {
   });
 
   return (
-    <Card>
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader>
         <CardTitle>Transazioni Recenti</CardTitle>
         <CardDescription>Le tue ultime 4 transazioni</CardDescription>
@@ -36,7 +36,7 @@ export async function RecentTransactions() {
           {transactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between rounded-lg border p-3"
+              className="flex items-center justify-between rounded-lg border p-3 relative"
             >
               <div className="flex items-center gap-3">
                 <div
@@ -72,24 +72,25 @@ export async function RecentTransactions() {
                 <div
                   className={cn(
                     "font-medium",
-                    Number(transaction.amount) > 0
-                      ? "text-green-600"
-                      : transaction.type === "TRANSFER"
-                      ? "text-blue-600"
-                      : "text-red-600"
+                    transaction.type === "INCOME"
+                      ? " text-green-700"
+                      : transaction.type === "EXPENSE"
+                      ? " text-red-700"
+                      : " text-blue-700"
                   )}
                 >
                   {formatCurrency(Number(transaction.amount))}
                 </div>
                 <Badge
                   variant="default"
-                  className={
+                  className={cn(
+                    "absolute -right-2 -top-2",
                     transaction.type === "INCOME"
                       ? "bg-green-100 text-green-700"
                       : transaction.type === "EXPENSE"
                       ? "bg-red-100 text-red-700"
                       : "bg-blue-100 text-blue-700"
-                  }
+                  )}
                 >
                   {transaction.type === "INCOME"
                     ? "Entrata"

@@ -27,7 +27,25 @@ export async function POST(request: NextRequest) {
         userId,
       },
     });
-    if (transactionType === "TRANSFER") {
+    if (transactionType === "INCOME") {
+      await prisma.account.update({
+        where: { id: sourceAccountId },
+        data: {
+          balance: {
+            increment: amount,
+          },
+        },
+      });
+    } else if (transactionType === "EXPENSE") {
+      await prisma.account.update({
+        where: { id: sourceAccountId },
+        data: {
+          balance: {
+            decrement: amount,
+          },
+        },
+      });
+    } else {
       await prisma.account.update({
         where: { id: sourceAccountId },
         data: {
@@ -38,15 +56,6 @@ export async function POST(request: NextRequest) {
       });
       await prisma.account.update({
         where: { id: destinationAccountId },
-        data: {
-          balance: {
-            increment: amount,
-          },
-        },
-      });
-    } else {
-      await prisma.account.update({
-        where: { id: sourceAccountId },
         data: {
           balance: {
             increment: amount,

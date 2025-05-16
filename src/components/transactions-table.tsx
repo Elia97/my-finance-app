@@ -112,11 +112,11 @@ export function TransactionsTable({
               <TableCell
                 className={cn(
                   "text-right font-medium",
-                  Number(transaction.amount) > 0
-                    ? "text-green-600"
-                    : transaction.type === "TRANSFER"
-                    ? "text-blue-600"
-                    : "text-red-600"
+                  transaction.type === "INCOME"
+                    ? "text-green-700"
+                    : transaction.type === "EXPENSE"
+                    ? "text-red-700"
+                    : "text-blue-700"
                 )}
               >
                 {formatCurrency(Number(transaction.amount))}

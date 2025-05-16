@@ -21,6 +21,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { signOut } from "next-auth/react";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -66,7 +67,11 @@ export function Sidebar() {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter className="border-t p-4">
-          <Button variant="outline" className="w-full justify-start gap-2">
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-2"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+          >
             <LogOut className="h-4 w-4" />
             <span>Esci</span>
           </Button>

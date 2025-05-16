@@ -1,41 +1,35 @@
 import { prisma } from "@/lib/prisma";
 import { TransactionType } from "@prisma/client";
-import { startOfMonth, subMonths } from "date-fns"; // Utilizzo di date-fns per manipolare le date
+import { startOfYear } from "date-fns";
 
-export async function getLastThreeMonthsStats() {
-  // Calcola la data di inizio del mese 3 mesi fa
-  const threeMonthsAgo = subMonths(startOfMonth(new Date()), 3);
+export async function getCurrentYearStats() {
+  const startOfCurrentYear = startOfYear(new Date());
 
-  // Esegui la query per ottenere le transazioni
   const stats = await prisma.transaction.findMany({
     where: {
       OR: [{ type: TransactionType.INCOME }, { type: TransactionType.EXPENSE }],
       date: {
-        gte: threeMonthsAgo, // Data maggiore o uguale a tre mesi fa
+        gte: startOfCurrentYear,
       },
     },
     orderBy: {
-      date: "asc", // Ordina per data crescente
+      date: "asc",
     },
   });
 
-  // Aggrega i dati per mese
   const monthsData: { [key: string]: { income: number; expenses: number } } =
     {};
 
   stats.forEach((transaction) => {
-    // Formatta la data per ottenere il mese e l'anno (es. "Gen 2025")
     const monthYear = transaction.date.toLocaleString("it-IT", {
       month: "short",
       year: "numeric",
     });
 
-    // Inizializza l'oggetto per il mese se non esiste
     if (!monthsData[monthYear]) {
       monthsData[monthYear] = { income: 0, expenses: 0 };
     }
 
-    // Somma le entrate e le uscite per il mese specifico
     if (transaction.type === TransactionType.INCOME) {
       monthsData[monthYear].income += Number(transaction.amount);
     } else if (transaction.type === TransactionType.EXPENSE) {
@@ -43,7 +37,6 @@ export async function getLastThreeMonthsStats() {
     }
   });
 
-  // Converte l'oggetto in un array con la struttura desiderata
   const formattedData = Object.entries(monthsData).map(([name, values]) => ({
     name,
     income: values.income,

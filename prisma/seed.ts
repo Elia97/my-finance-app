@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -22,7 +22,7 @@ async function main() {
         name: "IsyBank",
         type: "CHECKING",
         userId: user.id,
-        balance: 2272.06,
+        balance: 1272.06,
         number: "IT02J0338501601100080961954",
       },
       {
