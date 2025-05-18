@@ -12,12 +12,12 @@ import {
 export function TrendChart({
   data,
 }: {
-  data: { month: string; expenses: number }[];
+  data: { name: string; expenses: number }[];
 }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={data}>
-        <XAxis dataKey="month" />
+        <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
         <Line

@@ -1,0 +1,19 @@
+/*
+  Warnings:
+
+  - The values [BUY,SELL] on the enum `TransactionType` will be removed. If these variants are still used in the database, this will fail.
+
+*/
+-- CreateEnum
+CREATE TYPE "InvestmentTransactionType" AS ENUM ('BUY', 'SELL');
+
+-- AlterEnum
+BEGIN;
+CREATE TYPE "TransactionType_new" AS ENUM ('INCOME', 'EXPENSE', 'TRANSFER');
+ALTER TABLE "Transaction" ALTER COLUMN "type" TYPE "TransactionType_new" USING ("type"::text::"TransactionType_new");
+ALTER TABLE "Investment" ALTER COLUMN "type" TYPE "TransactionType_new" USING ("type"::text::"TransactionType_new");
+ALTER TABLE "InvestmentTransaction" ALTER COLUMN "type" TYPE "TransactionType_new" USING ("type"::text::"TransactionType_new");
+ALTER TYPE "TransactionType" RENAME TO "TransactionType_old";
+ALTER TYPE "TransactionType_new" RENAME TO "TransactionType";
+DROP TYPE "TransactionType_old";
+COMMIT;

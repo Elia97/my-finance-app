@@ -4,10 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  transactionSchema,
-  type TransactionFormData,
-} from "@/types/transaction";
+import { transactionSchema, type TransactionFormData } from "@/lib/schemas";
 import {
   Dialog,
   DialogContent,
@@ -28,14 +25,12 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { Account, Category } from "@/lib/types";
 
 interface AddTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-type Category = { id: string; name: string };
-type Account = { id: string; name: string };
 
 export function AddTransactionDialog({
   open,
@@ -56,7 +51,7 @@ export function AddTransactionDialog({
       destinationAccountId: "",
       categoryId: "",
       transactionType: "EXPENSE",
-      userId: "2ad3d12d-de4b-411a-b003-fd0fafe746ef",
+      userId: "7a62da2d-c4e7-488f-854e-efef60b3ec91",
     },
   });
 

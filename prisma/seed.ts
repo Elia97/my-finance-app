@@ -42,34 +42,42 @@ async function main() {
       {
         name: "Alimentari",
         userId: user.id,
+        color: "#FF0000",
       },
       {
         name: "Apprendimento",
         userId: user.id,
+        color: "#FFA500",
       },
       {
         name: "Casa",
         userId: user.id,
+        color: "#FFFF00",
       },
       {
         name: "Vestiti",
         userId: user.id,
+        color: "#008000",
       },
       {
         name: "Intrattenimento",
         userId: user.id,
+        color: "#00FFFF",
       },
       {
         name: "Debito",
         userId: user.id,
+        color: "#0000FF",
       },
       {
         name: "Salute",
         userId: user.id,
+        color: "#FFC0CB",
       },
       {
         name: "Trasporti",
         userId: user.id,
+        color: "#FF00FF",
       },
     ],
   });

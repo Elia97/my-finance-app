@@ -13,7 +13,7 @@ import {
 export function MonthlyChart({
   data,
 }: {
-  data: { name: string; income: number; expenses: number }[];
+  data: { name: string; expenses: number; transfers: number }[];
 }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -22,8 +22,8 @@ export function MonthlyChart({
         <YAxis />
         <Tooltip />
         <Legend />
-        <Bar dataKey="income" name="Entrate" fill="#22c55e" />
         <Bar dataKey="expenses" name="Uscite" fill="#ef4444" />
+        <Bar dataKey="transfers" name="Trasferimenti" fill="#155dfc" />
       </BarChart>
     </ResponsiveContainer>
   );

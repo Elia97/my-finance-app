@@ -15,23 +15,45 @@ export async function getMonthlyStats() {
     orderBy: { date: "asc" },
   });
 
-  const statsMap = new Map<string, { income: number; expenses: number }>();
+  const transfers = await prisma.transaction.groupBy({
+    by: ["date"],
+    where: { type: "TRANSFER" },
+    _sum: { amount: true },
+    orderBy: { date: "asc" },
+  });
+
+  const statsMap = new Map<
+    string,
+    { income: number; expenses: number; transfers: number }
+  >();
+
+  const addToMap = (
+    key: string,
+    field: "income" | "expenses" | "transfers",
+    value: number
+  ) => {
+    const existing = statsMap.get(key) || {
+      income: 0,
+      expenses: 0,
+      transfers: 0,
+    };
+    existing[field] += value;
+    statsMap.set(key, existing);
+  };
 
   for (const entry of income) {
     const key = new Date(entry.date).toISOString().slice(0, 7); // YYYY-MM
-    statsMap.set(key, {
-      income: Number(entry._sum.amount) ?? 0,
-      expenses: 0,
-    });
+    addToMap(key, "income", Number(entry._sum.amount) ?? 0);
   }
 
   for (const entry of expenses) {
-    const key = new Date(entry.date).toISOString().slice(0, 7); // YYYY-MM
-    const existing = statsMap.get(key) || { income: 0, expenses: 0 };
-    statsMap.set(key, {
-      income: existing.income,
-      expenses: Math.abs(Number(entry._sum.amount) ?? 0),
-    });
+    const key = new Date(entry.date).toISOString().slice(0, 7);
+    addToMap(key, "expenses", Number(entry._sum.amount) ?? 0);
+  }
+
+  for (const entry of transfers) {
+    const key = new Date(entry.date).toISOString().slice(0, 7);
+    addToMap(key, "transfers", Number(entry._sum.amount) ?? 0);
   }
 
   const formatted = Array.from(statsMap.entries()).map(([key, values]) => {
@@ -41,6 +63,7 @@ export async function getMonthlyStats() {
       name: date.toLocaleString("it-IT", { month: "short", year: "numeric" }),
       income: values.income,
       expenses: values.expenses,
+      transfers: values.transfers,
     };
   });
 

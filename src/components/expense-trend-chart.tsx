@@ -6,20 +6,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TrendChart } from "./charts/trend-chart";
-import { getExpensesByMonth } from "@/lib/queries/expenses-by-month";
+import { getMonthlyStats } from "@/lib/queries/monthly-stats";
 
 export async function ExpenseTrendChart() {
-  const data = await getExpensesByMonth();
+  const stats = await getMonthlyStats();
+  const expenses = stats.map(({ name, expenses }) => ({
+    name,
+    expenses,
+  }));
   return (
     <Card>
       <CardHeader>
         <CardTitle>Andamento Spese</CardTitle>
-        <CardDescription>
-          Trend delle spese negli ultimi 12 mesi
-        </CardDescription>
+        <CardDescription>Trend delle spese</CardDescription>
       </CardHeader>
       <CardContent>
-        <TrendChart data={data} />
+        <TrendChart data={expenses} />
       </CardContent>
     </Card>
   );

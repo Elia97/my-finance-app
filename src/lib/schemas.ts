@@ -1,4 +1,3 @@
-// types/transaction.ts
 import { z } from "zod";
 
 export const transactionSchema = z.object({
@@ -12,4 +11,10 @@ export const transactionSchema = z.object({
   userId: z.string().min(1, "L'ID utente è obbligatorio"),
 });
 
+export const loginSchema = z.object({
+  email: z.string().email({ message: "Inserisci un'email valida" }),
+  password: z.string().min(1, { message: "La password è obbligatoria" }),
+});
+
 export type TransactionFormData = z.infer<typeof transactionSchema>;
+export type LoginFormData = z.infer<typeof loginSchema>;

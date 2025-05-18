@@ -22,15 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Prisma } from "@prisma/client";
-
-type TransactionWithRelations = Prisma.TransactionGetPayload<{
-  include: {
-    user: true;
-    category: true;
-    sourceAccount: true;
-  };
-}>;
+import { TransactionWithRelations } from "@/lib/types";
 
 export function TransactionsTable({
   transactions,

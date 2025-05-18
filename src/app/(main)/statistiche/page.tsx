@@ -8,11 +8,11 @@ export default function StatisticsPage() {
   return (
     <div className="flex flex-col gap-6">
       <StatisticsHeader />
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-2">
         <ExpenseTrendChart />
         <CategoryDistributionChart />
       </div>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-2">
         <IncomeExpenseComparisonChart />
         <SavingsGoalProgress />
       </div>

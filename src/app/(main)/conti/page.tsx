@@ -6,7 +6,7 @@ export default function AccountsPage() {
   return (
     <div className="flex flex-col gap-6">
       <AccountsHeader />
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-2">
         <AccountsList />
         <AccountStats />
       </div>

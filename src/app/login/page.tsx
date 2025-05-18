@@ -1,57 +1,98 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { loginSchema, type LoginFormData } from "@/lib/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: LoginFormData) => {
     const res = await signIn("credentials", {
-      email,
-      password,
+      ...values,
       redirect: false,
     });
 
     if (res?.ok) {
-      router.push("/"); // Redirect alla home protetta
+      router.push("/");
     } else {
-      alert("Credenziali errate");
+      form.setError("password", {
+        message: "Email o password non validi",
+      });
     }
   };
 
   return (
     <main className="flex items-center justify-center h-screen bg-background">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm p-8 bg-white rounded shadow"
-      >
-        <h1 className="text-xl font-bold mb-4">Accedi a FinTrack</h1>
-        <input
-          type="email"
-          placeholder="Email"
-          className="mb-4 w-full p-2 border rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="mb-4 w-full p-2 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="w-full bg-black text-white py-2 rounded"
-        >
-          Accedi
-        </button>
-      </form>
+      <Card className="w-full max-w-sm shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl">
+            Accedi con le tue credenziali
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Email" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Password"
+                        type="password"
+                        autoComplete="current-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full">
+                Accedi
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </main>
   );
 }
