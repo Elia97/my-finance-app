@@ -8,11 +8,23 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { ArrowDownRight, ArrowUpRight, RefreshCw } from "lucide-react";
 import { getAccountStats } from "@/lib/queries/account-stats";
+import { getInvestmentsData } from "@/lib/queries/investments-data";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function AccountStats() {
   const { totalBalance, totalIncome, totalExpenses, totalTransfers } =
     await getAccountStats();
 
+  const session = await getServerSession(authOptions);
+
+  const userId = session?.user?.id; // Assicurati di avere l'ID utente dalla sessione
+
+  if (!session || !userId) {
+    return <div>Accesso negato</div>;
+  }
+
+  const { investedAmount, totalReturn } = await getInvestmentsData(userId);
   return (
     <Card>
       <CardHeader>
@@ -26,7 +38,9 @@ export async function AccountStats() {
               Patrimonio Totale
             </div>
             <div className="mt-1 text-2xl font-bold">
-              {formatCurrency(Number(totalBalance))}
+              {formatCurrency(
+                Number(totalBalance) + investedAmount + totalReturn
+              )}
             </div>
           </div>
 

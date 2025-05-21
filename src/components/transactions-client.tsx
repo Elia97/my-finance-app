@@ -5,7 +5,7 @@ import { TransactionsHeader } from "@/components/transactions-header";
 import { TransactionsTable } from "@/components/transactions-table";
 import { TransactionFilters } from "@/components/transaction-filters";
 import { TransactionType } from "@prisma/client";
-import { TransactionWithRelations } from "@/lib/types";
+import { TransactionWithRelations } from "@/types/types";
 
 interface TransactionsClientProps {
   transactions: TransactionWithRelations[];
@@ -14,7 +14,7 @@ interface TransactionsClientProps {
 export function TransactionsClient({ transactions }: TransactionsClientProps) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState<TransactionType | "all">("all");
-  const [accountId, setAccountId] = useState<string | "all">("all");
+  const [categoryId, setCategoryId] = useState<string | "all">("all");
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -23,12 +23,12 @@ export function TransactionsClient({ transactions }: TransactionsClientProps) {
         tx.description?.toLowerCase().includes(search.toLowerCase());
 
       const matchesType = type === "all" || tx.type === type;
-      const matchesAccount =
-        accountId === "all" || tx.sourceAccountId === accountId;
+      const matchesCategory =
+        categoryId === "all" || tx.categoryId === categoryId;
 
-      return matchesSearch && matchesType && matchesAccount;
+      return matchesSearch && matchesType && matchesCategory;
     });
-  }, [transactions, search, type, accountId]);
+  }, [transactions, search, type, categoryId]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,8 +38,8 @@ export function TransactionsClient({ transactions }: TransactionsClientProps) {
         setSearch={setSearch}
         type={type}
         setType={setType}
-        accountId={accountId}
-        setAccountId={setAccountId}
+        categoryId={categoryId}
+        setCategoryId={setCategoryId}
       />
       <TransactionsTable transactions={filteredTransactions} />
     </div>

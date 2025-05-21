@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
-import { Account } from "@/lib/types";
+import { Category } from "@/types/types";
 import { TransactionType } from "@prisma/client";
 
 interface TransactionFiltersProps {
@@ -19,8 +19,8 @@ interface TransactionFiltersProps {
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   type: TransactionType | "all";
   setType: React.Dispatch<React.SetStateAction<TransactionType | "all">>;
-  accountId: string;
-  setAccountId: React.Dispatch<React.SetStateAction<string>>;
+  categoryId: string;
+  setCategoryId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function TransactionFilters({
@@ -28,20 +28,20 @@ export function TransactionFilters({
   setSearch,
   type,
   setType,
-  accountId,
-  setAccountId,
+  categoryId,
+  setCategoryId,
 }: TransactionFiltersProps) {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const transactionTypes = Object.values(TransactionType);
 
   useEffect(() => {
-    const fetchAccounts = async () => {
-      const res = await fetch("/api/accounts");
+    const fetchCategories = async () => {
+      const res = await fetch("/api/categories");
       const data = await res.json();
-      setAccounts(data);
+      setCategories(data);
     };
 
-    fetchAccounts();
+    fetchCategories();
   }, []);
 
   return (
@@ -76,15 +76,15 @@ export function TransactionFilters({
             ))}
           </SelectContent>
         </Select>
-        <Select value={accountId} onValueChange={setAccountId}>
+        <Select value={categoryId} onValueChange={setCategoryId}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Conto" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tutti</SelectItem>
-            {accounts.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                {account.name}
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
               </SelectItem>
             ))}
           </SelectContent>

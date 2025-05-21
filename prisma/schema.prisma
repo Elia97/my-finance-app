@@ -15,7 +15,7 @@ model User {
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
   accounts               Account[]
-  investments            Investment[]
+  investments            Investment[]            @relation("UserInvestments")
   investmentTransactions InvestmentTransaction[]
   transactions           Transaction[]
   categories             Category[]
@@ -34,6 +34,7 @@ model Account {
   user                    User          @relation(fields: [userId], references: [id])
   destinationTransactions Transaction[] @relation("DestinationAccount")
   sourceTransactions      Transaction[] @relation("SourceAccount")
+  investments             Investment[]
 }
 
 model Transaction {
@@ -55,27 +56,32 @@ model Transaction {
 model Investment {
   id            String                  @id @default(uuid())
   name          String
-  type          TransactionType
+  type          InvestmentType
   quantity      Decimal
   purchasePrice Decimal
   currentPrice  Decimal
   currency      String                  @default("EUR")
+  accountId     String
   userId        String
+  startDate     DateTime
   createdAt     DateTime                @default(now())
   updatedAt     DateTime                @updatedAt
-  user          User                    @relation(fields: [userId], references: [id])
+  account       Account                 @relation(fields: [accountId], references: [id])
+  user          User                    @relation("UserInvestments", fields: [userId], references: [id])
   transactions  InvestmentTransaction[]
 }
 
 model InvestmentTransaction {
-  id           String          @id @default(uuid())
-  type         TransactionType
+  id           String                    @id @default(uuid())
+  type         InvestmentTransactionType
   amount       Decimal
-  date         DateTime        @default(now())
+  quantity     Decimal
+  price        Decimal
+  date         DateTime                  @default(now())
   investmentId String
   userId       String
-  investment   Investment      @relation(fields: [investmentId], references: [id])
-  user         User            @relation(fields: [userId], references: [id])
+  investment   Investment                @relation(fields: [investmentId], references: [id])
+  user         User                      @relation(fields: [userId], references: [id])
 }
 
 model Category {
@@ -92,6 +98,13 @@ model Category {
 enum AccountType {
   CHECKING
   INVESTMENT
+}
+
+enum InvestmentType {
+  STOCK
+  BOND
+  ETF
+  CRYPTO
 }
 
 enum TransactionType {

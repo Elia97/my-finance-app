@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TransactionWithRelations } from "@/lib/types";
+import { TransactionWithRelations } from "@/types/types";
 
 export function TransactionsTable({
   transactions,

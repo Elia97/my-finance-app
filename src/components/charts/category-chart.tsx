@@ -14,7 +14,6 @@ export function CategoryChart({
 }: {
   data: { name: string; value: number; color: string }[];
 }) {
-  console.log("CategoryChart data", data);
   const filteredData = data.filter((entry) => entry.value > 0);
   return (
     <ResponsiveContainer width="100%" height={300}>

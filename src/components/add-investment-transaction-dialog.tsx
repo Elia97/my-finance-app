@@ -4,7 +4,10 @@ import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { transactionSchema, type TransactionFormData } from "@/types/schemas";
+import {
+  investmentTransactionSchema,
+  type InvestmentTransactionFormData,
+} from "@/types/schemas";
 import {
   Dialog,
   DialogContent,
@@ -25,22 +28,21 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Account, Category } from "@/types/types";
 import { useSession } from "next-auth/react";
+import { Investment } from "@/types/types";
 
-interface AddTransactionDialogProps {
+interface AddInvestmentTransactionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function AddTransactionDialog({
+export function AddInvestmentTransactionDialog({
   open,
   onOpenChange,
-}: AddTransactionDialogProps) {
+}: AddInvestmentTransactionDialogProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [investments, setInvestments] = useState<Investment[]>([]);
   const { data: session, status } = useSession();
   const {
     register,
@@ -49,32 +51,22 @@ export function AddTransactionDialog({
     setValue,
     reset,
     formState: { errors },
-  } = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
+  } = useForm<InvestmentTransactionFormData>({
+    resolver: zodResolver(investmentTransactionSchema),
     defaultValues: {
-      description: "",
-      amount: undefined,
+      quantity: undefined,
+      purchasePrice: undefined,
       date: new Date().toISOString().split("T")[0],
-      sourceAccountId: "",
-      destinationAccountId: "",
-      categoryId: "",
-      transactionType: "EXPENSE",
+      investmentId: "",
       userId: "",
+      transactionType: "BUY",
     },
   });
   const transactionType = watch("transactionType");
 
-  const onSubmit = async (data: TransactionFormData) => {
-    if (transactionType === "TRANSFER") {
-      delete data.categoryId;
-    } else if (transactionType === "INCOME") {
-      delete data.destinationAccountId;
-      delete data.categoryId;
-    } else {
-      delete data.destinationAccountId;
-    }
+  const onSubmit = async (data: InvestmentTransactionFormData) => {
     try {
-      const res = await fetch("/api/transactions", {
+      const res = await fetch("/api/investment-transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,19 +99,13 @@ export function AddTransactionDialog({
   };
 
   useEffect(() => {
-    const fetchAccounts = async () => {
-      const res = await fetch("/api/accounts");
+    const fetchInvestments = async () => {
+      const res = await fetch("/api/investments");
       const data = await res.json();
-      setAccounts(data);
-    };
-    const fetchCategories = async () => {
-      const res = await fetch("/api/categories");
-      const data = await res.json();
-      setCategories(data);
+      setInvestments(data);
     };
 
-    fetchAccounts();
-    fetchCategories();
+    fetchInvestments();
 
     if (session?.user?.id) {
       setValue("userId", session.user.id);
@@ -146,12 +132,12 @@ export function AddTransactionDialog({
             onValueChange={(val) =>
               setValue(
                 "transactionType",
-                val as TransactionFormData["transactionType"]
+                val as InvestmentTransactionFormData["transactionType"]
               )
             }
             className="grid grid-cols-3 gap-4"
           >
-            {["INCOME", "EXPENSE", "TRANSFER"].map((type) => (
+            {["BUY", "SELL"].map((type) => (
               <div key={type}>
                 <RadioGroupItem
                   value={type}
@@ -162,38 +148,37 @@ export function AddTransactionDialog({
                   htmlFor={type}
                   className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary"
                 >
-                  <span>
-                    {type === "EXPENSE"
-                      ? "Spesa"
-                      : type === "INCOME"
-                      ? "Entrata"
-                      : "Trasferimento"}
-                  </span>
+                  <span>{type === "BUY" ? "Compra" : "Vendi"}</span>
                 </Label>
               </div>
             ))}
           </RadioGroup>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Descrizione</Label>
-            <Input id="description" {...register("description")} />
-            {errors.description && (
-              <p className="text-sm text-red-500">
-                {errors.description.message}
-              </p>
+            <Label htmlFor="quantity">Quantità</Label>
+            <Input
+              id="quantity"
+              type="number"
+              step="0.01"
+              {...register("quantity")}
+            />
+            {errors.quantity && (
+              <p className="text-sm text-red-500">{errors.quantity.message}</p>
             )}
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="amount">Importo (€)</Label>
+            <Label htmlFor="purchasePrice">Prezzo (€)</Label>
             <Input
-              id="amount"
+              id="purchasePrice"
               type="number"
               step="0.01"
-              {...register("amount")}
+              {...register("purchasePrice")}
             />
-            {errors.amount && (
-              <p className="text-sm text-red-500">{errors.amount.message}</p>
+            {errors.purchasePrice && (
+              <p className="text-sm text-red-500">
+                {errors.purchasePrice.message}
+              </p>
             )}
           </div>
 
@@ -203,77 +188,25 @@ export function AddTransactionDialog({
           </div>
 
           <div className="grid gap-2">
-            <Label>Conto</Label>
-            <Select onValueChange={(val) => setValue("sourceAccountId", val)}>
+            <Label>Investimento</Label>
+            <Select onValueChange={(val) => setValue("investmentId", val)}>
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona un conto" />
               </SelectTrigger>
               <SelectContent>
-                {accounts.map((acc) => (
+                {investments.map((acc) => (
                   <SelectItem key={acc.id} value={acc.id}>
                     {acc.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.sourceAccountId && (
+            {errors.investmentId && (
               <p className="text-sm text-red-500">
-                {errors.sourceAccountId.message}
+                {errors.investmentId.message}
               </p>
             )}
           </div>
-
-          {transactionType === "EXPENSE" ? (
-            <div className="grid gap-2">
-              <Label>Categoria</Label>
-              <Select onValueChange={(val) => setValue("categoryId", val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleziona una categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : transactionType === "TRANSFER" ? (
-            <div className="grid gap-2">
-              <Label>Conto Destinazione</Label>
-              <Select
-                onValueChange={(val) => setValue("destinationAccountId", val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleziona un conto" />
-                </SelectTrigger>
-                <SelectContent>
-                  {accounts.map((acc) => (
-                    <SelectItem key={acc.id} value={acc.id}>
-                      {acc.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <div className="grid gap-2 invisible">
-              <Label>Categoria</Label>
-              <Select onValueChange={(val) => setValue("categoryId", val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleziona una categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
 
           <DialogFooter>
             <Button type="submit">Salva Transazione</Button>

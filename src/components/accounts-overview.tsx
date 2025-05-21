@@ -7,13 +7,25 @@ import {
 } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
+import { getInvestmentsData } from "@/lib/queries/investments-data";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function AccountsOverview() {
   const accounts = await prisma.account.findMany();
-  const totalBalance = accounts.reduce(
-    (sum, account) => sum + Number(account.balance),
-    0
-  );
+  const session = await getServerSession(authOptions);
+
+  const userId = session?.user?.id; // Assicurati di avere l'ID utente dalla sessione
+
+  if (!session || !userId) {
+    return <div>Accesso negato</div>;
+  }
+
+  const { totalValue, cashBalance } = await getInvestmentsData(userId);
+
+  const totalBalance = accounts.reduce((acc: number, account) => {
+    return acc + Number(account.balance);
+  }, 0);
 
   return (
     <Card className="col-span-2">
@@ -37,14 +49,16 @@ export async function AccountsOverview() {
                 </div>
               </div>
               <div className="font-medium">
-                {formatCurrency(Number(account.balance))}
+                {account.type === "CHECKING"
+                  ? formatCurrency(Number(account.balance))
+                  : formatCurrency(totalValue)}
               </div>
             </div>
           ))}
           <div className="flex items-center justify-between rounded-lg bg-muted p-4">
             <div className="font-medium">Patrimonio Totale</div>
             <div className="text-lg font-bold">
-              {formatCurrency(totalBalance)}
+              {formatCurrency(totalBalance + totalValue - cashBalance)}
             </div>
           </div>
         </div>

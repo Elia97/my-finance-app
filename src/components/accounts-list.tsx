@@ -15,9 +15,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { prisma } from "@/lib/prisma";
+import { getInvestmentsData } from "@/lib/queries/investments-data";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function AccountsList() {
   const accounts = await prisma.account.findMany();
+  const session = await getServerSession(authOptions);
+
+  const userId = session?.user?.id; // Assicurati di avere l'ID utente dalla sessione
+
+  if (!session || !userId) {
+    return <div>Accesso negato</div>;
+  }
+
+  const { totalValue } = await getInvestmentsData(userId);
   return (
     <Card>
       <CardHeader>
@@ -67,8 +79,10 @@ export async function AccountsList() {
                 <div className="text-sm text-muted-foreground">
                   {account.number?.slice(0, 4)}****{account.number?.slice(-4)}
                 </div>
-                <div className="text-xl font-bold">
-                  {formatCurrency(Number(account.balance))}
+                <div className="text-xl font-bold text-right">
+                  {account.type === "CHECKING"
+                    ? formatCurrency(Number(account.balance))
+                    : formatCurrency(totalValue)}
                 </div>
               </div>
               <div className="mt-4 flex gap-2">

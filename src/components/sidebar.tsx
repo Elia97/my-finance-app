@@ -9,6 +9,7 @@ import {
   ArrowLeftRight,
   Settings,
   LogOut,
+  LineChart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,7 @@ const navItems = [
   { name: "Conti", href: "/conti", icon: Wallet },
   { name: "Transazioni", href: "/transazioni", icon: ArrowLeftRight },
   { name: "Statistiche", href: "/statistiche", icon: BarChart3 },
+  { name: "Investimenti", href: "/investimenti", icon: LineChart },
   { name: "Impostazioni", href: "/impostazioni", icon: Settings },
 ];
 
