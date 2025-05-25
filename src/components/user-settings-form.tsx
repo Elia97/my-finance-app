@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 
 const userFormSchema = z.object({
+  id: z.string(),
   name: z.string().min(2, {
     message: "Il nome deve contenere almeno 2 caratteri.",
   }),
@@ -34,24 +35,41 @@ const userFormSchema = z.object({
 
 type UserFormValues = z.infer<typeof userFormSchema>;
 
-// Dati di esempio
-const defaultValues: Partial<UserFormValues> = {
-  name: "Mario Rossi",
-  email: "mario.rossi@example.com",
-};
+export function UserSettingsForm({ user }: { user: UserFormValues }) {
+  const defaultValues: Partial<UserFormValues> = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  };
 
-export function UserSettingsForm() {
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues,
   });
 
-  function onSubmit() {
-    toast.success("Impostazioni account aggiornate", {
-      description:
-        "Le tue informazioni personali sono state aggiornate con successo.",
-    });
-  }
+  const onSubmit = async (data: UserFormValues) => {
+    try {
+      const response = await fetch(`/api/user/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Errore durante l'aggiornamento dell'account");
+      }
+
+      toast.success("Account aggiornato con successo!");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Si è verificato un errore sconosciuto."
+      );
+    }
+  };
 
   return (
     <Form {...form}>
@@ -97,8 +115,7 @@ export function UserSettingsForm() {
             )}
           />
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Annulla</Button>
+        <CardFooter className="flex justify-end">
           <Button type="submit">Salva modifiche</Button>
         </CardFooter>
       </form>

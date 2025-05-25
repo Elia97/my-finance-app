@@ -1,8 +1,7 @@
 import { StatisticsHeader } from "@/components/statistics-header";
 import { ExpenseTrendChart } from "@/components/expense-trend-chart";
 import { CategoryDistributionChart } from "@/components/category-distribution-chart";
-import { IncomeExpenseComparisonChart } from "@/components/income-expense-comparison-chart";
-import { SavingsGoalProgress } from "@/components/savings-goal-progress";
+import { IncomeExpenseComparison } from "@/components/income-expense-comparison-chart";
 
 export default function StatisticsPage() {
   return (
@@ -11,10 +10,7 @@ export default function StatisticsPage() {
       <div className="grid gap-6 xl:grid-cols-2">
         <ExpenseTrendChart />
         <CategoryDistributionChart />
-      </div>
-      <div className="grid gap-6 xl:grid-cols-2">
-        <IncomeExpenseComparisonChart />
-        <SavingsGoalProgress />
+        <IncomeExpenseComparison />
       </div>
     </div>
   );

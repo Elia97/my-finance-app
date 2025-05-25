@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardContent,
@@ -7,53 +5,44 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { getMonthlyStats } from "@/lib/queries/monthly-stats";
+import { IncomeExpenseComparisonChart } from "./charts/income-expense-comparison-chart";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-// Dati di esempio
-const data = [
-  {
-    name: "Gen",
-    entrate: 2300,
-    uscite: 1200,
-  },
-  {
-    name: "Feb",
-    entrate: 2300,
-    uscite: 1100,
-  },
-  {
-    name: "Mar",
-    entrate: 2300,
-    uscite: 1300,
-  },
-  {
-    name: "Apr",
-    entrate: 2300,
-    uscite: 1150,
-  },
-  {
-    name: "Mag",
-    entrate: 2300,
-    uscite: 1450,
-  },
-  {
-    name: "Giu",
-    entrate: 2300,
-    uscite: 1350,
-  },
-];
+export async function IncomeExpenseComparison() {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
 
-export function IncomeExpenseComparisonChart() {
+  if (!session || !userId) {
+    return <div>Accesso negato</div>;
+  }
+  const stats = await getMonthlyStats(userId);
+  const incomeVsExpenses = stats.map(({ name, income, expenses }) => ({
+    name,
+    income,
+    expenses,
+  }));
+
+  if (incomeVsExpenses.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Entrate vs Uscite</CardTitle>
+          <CardDescription>Nessuna informazione disponibile</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground">
+            Non hai ancora registrato entrate o uscite. Inizia aggiungendo una
+            nuova transazione.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card>
+    <Card className="col-span-2 xl:col-span-1">
       <CardHeader>
         <CardTitle>Entrate vs Uscite</CardTitle>
         <CardDescription>
@@ -61,16 +50,7 @@ export function IncomeExpenseComparisonChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="entrate" name="Entrate" fill="#22c55e" />
-            <Bar dataKey="uscite" name="Uscite" fill="#ef4444" />
-          </BarChart>
-        </ResponsiveContainer>
+        <IncomeExpenseComparisonChart data={incomeVsExpenses} />
       </CardContent>
     </Card>
   );

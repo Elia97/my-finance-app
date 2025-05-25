@@ -1,23 +1,23 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getMonthlyStats() {
+export async function getMonthlyStats(userId: string) {
   const income = await prisma.transaction.groupBy({
     by: ["date"],
-    where: { type: "INCOME" },
+    where: { type: "INCOME", userId },
     _sum: { amount: true },
     orderBy: { date: "asc" },
   });
 
   const expenses = await prisma.transaction.groupBy({
     by: ["date"],
-    where: { type: "EXPENSE" },
+    where: { type: "EXPENSE", userId },
     _sum: { amount: true },
     orderBy: { date: "asc" },
   });
 
   const transfers = await prisma.transaction.groupBy({
     by: ["date"],
-    where: { type: "TRANSFER" },
+    where: { type: "TRANSFER", userId },
     _sum: { amount: true },
     orderBy: { date: "asc" },
   });

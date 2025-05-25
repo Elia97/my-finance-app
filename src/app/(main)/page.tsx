@@ -1,7 +1,7 @@
 import { DashboardHeader } from "@/components/dashboard-header";
 import { AccountsOverview } from "@/components/accounts-overview";
 import { RecentTransactions } from "@/components/recent-transactions";
-import { MonthlyExpenseChart } from "@/components/monthly-expense-chart";
+import { MonthlyExpenses } from "@/components/monthly-expenses";
 import { TransactionSummary } from "@/components/transaction-summary";
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
         <TransactionSummary />
       </div>
       <div className="grid gap-6 md:grid-cols-2">
-        <MonthlyExpenseChart />
+        <MonthlyExpenses />
         <RecentTransactions />
       </div>
     </div>

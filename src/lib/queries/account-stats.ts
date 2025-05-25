@@ -1,12 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { TransactionType } from "@prisma/client";
 
-export async function getAccountStats() {
+export async function getAccountStats(userId: string) {
   const [totalBalance, totalIncome, totalExpenses, totalTransfers] =
     await Promise.all([
       prisma.account.aggregate({
         _sum: {
           balance: true,
+        },
+        where: {
+          userId: userId,
         },
       }),
       prisma.transaction.aggregate({
@@ -15,6 +18,7 @@ export async function getAccountStats() {
         },
         where: {
           type: TransactionType.INCOME,
+          userId: userId,
         },
       }),
       prisma.transaction.aggregate({
@@ -23,6 +27,7 @@ export async function getAccountStats() {
         },
         where: {
           type: TransactionType.EXPENSE,
+          userId: userId,
         },
       }),
       prisma.transaction.aggregate({
@@ -31,6 +36,7 @@ export async function getAccountStats() {
         },
         where: {
           type: TransactionType.TRANSFER,
+          userId: userId,
         },
       }),
     ]);

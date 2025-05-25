@@ -2,7 +2,13 @@
 CREATE TYPE "AccountType" AS ENUM ('CHECKING', 'INVESTMENT');
 
 -- CreateEnum
-CREATE TYPE "TransactionType" AS ENUM ('INCOME', 'EXPENSE', 'DEPOSIT', 'WITHDRAWAL', 'BUY', 'SELL');
+CREATE TYPE "InvestmentType" AS ENUM ('STOCK', 'BOND', 'ETF', 'CRYPTO');
+
+-- CreateEnum
+CREATE TYPE "TransactionType" AS ENUM ('INCOME', 'EXPENSE', 'TRANSFER');
+
+-- CreateEnum
+CREATE TYPE "InvestmentTransactionType" AS ENUM ('BUY', 'SELL');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -24,6 +30,7 @@ CREATE TABLE "Account" (
     "balance" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
     "currency" TEXT NOT NULL DEFAULT 'EUR',
     "userId" TEXT NOT NULL,
+    "number" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -49,12 +56,14 @@ CREATE TABLE "Transaction" (
 CREATE TABLE "Investment" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "type" "TransactionType" NOT NULL,
+    "type" "InvestmentType" NOT NULL,
     "quantity" DECIMAL(65,30) NOT NULL,
     "purchasePrice" DECIMAL(65,30) NOT NULL,
     "currentPrice" DECIMAL(65,30) NOT NULL,
     "currency" TEXT NOT NULL DEFAULT 'EUR',
+    "accountId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "startDate" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -64,8 +73,10 @@ CREATE TABLE "Investment" (
 -- CreateTable
 CREATE TABLE "InvestmentTransaction" (
     "id" TEXT NOT NULL,
-    "type" "TransactionType" NOT NULL,
+    "type" "InvestmentTransactionType" NOT NULL,
     "amount" DECIMAL(65,30) NOT NULL,
+    "quantity" DECIMAL(65,30) NOT NULL,
+    "price" DECIMAL(65,30) NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "investmentId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -78,6 +89,7 @@ CREATE TABLE "Category" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "color" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -86,6 +98,9 @@ CREATE TABLE "Category" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Account_number_key" ON "Account"("number");
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -101,6 +116,9 @@ ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_sourceAccountId_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Investment" ADD CONSTRAINT "Investment_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Investment" ADD CONSTRAINT "Investment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

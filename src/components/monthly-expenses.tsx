@@ -5,35 +5,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TrendChart } from "./charts/trend-chart";
+import { MonthlyExpensesChart } from "./charts/monthly-expenses-chart.tsx";
 import { getMonthlyStats } from "@/lib/queries/monthly-stats";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth.ts";
 
-export async function ExpenseTrendChart() {
+export async function MonthlyExpenses() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
   if (!session || !userId) {
     return <div>Accesso negato</div>;
   }
-
   const stats = await getMonthlyStats(userId);
-  const expenses = stats.map(({ name, expenses }) => ({
+  const expensesVsTransfers = stats.map(({ name, expenses, transfers }) => ({
     name,
     expenses,
+    transfers,
   }));
 
-  if (expenses.length === 0) {
+  if (expensesVsTransfers.length === 0) {
     return (
-      <Card>
+      <Card className="col-span-2 lg:col-span-1">
         <CardHeader>
           <CardTitle>Andamento Spese</CardTitle>
-          <CardDescription>Nessuna spesa registrata</CardDescription>
+          <CardDescription>Spese e trasferimenti mensili</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-muted-foreground">
-            Non hai ancora registrato spese. Inizia aggiungendo una nuova spesa.
+            Nessuna spesa o trasferimento trovato
           </div>
         </CardContent>
       </Card>
@@ -41,13 +41,13 @@ export async function ExpenseTrendChart() {
   }
 
   return (
-    <Card className="col-span-2">
+    <Card className="col-span-2 lg:col-span-1">
       <CardHeader>
         <CardTitle>Andamento Spese</CardTitle>
-        <CardDescription>Trend delle spese</CardDescription>
+        <CardDescription>Spese e trasferimenti mensili</CardDescription>
       </CardHeader>
       <CardContent>
-        <TrendChart data={expenses} />
+        <MonthlyExpensesChart data={expensesVsTransfers} />
       </CardContent>
     </Card>
   );

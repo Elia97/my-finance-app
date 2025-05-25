@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getCategoryDistribution() {
+export async function getCategoryDistribution(userId: string) {
   // 1. Recupera tutte le categorie con le transazioni
   const categories = await prisma.category.findMany({
     select: {
@@ -15,6 +15,9 @@ export async function getCategoryDistribution() {
           amount: true,
         },
       },
+    },
+    where: {
+      userId: userId, // Assicurati di filtrare per l'utente corrente
     },
   });
 

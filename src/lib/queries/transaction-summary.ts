@@ -1,7 +1,7 @@
 import { prisma } from "../prisma";
 import { TransactionType } from "@prisma/client";
 
-export async function getTransactionSummary() {
+export async function getTransactionSummary(userId: string) {
   // Get the current month
   const currentMonth = new Date().getMonth() + 1;
 
@@ -17,6 +17,7 @@ export async function getTransactionSummary() {
           gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
           lte: new Date(new Date().getFullYear(), currentMonth, 0),
         },
+        userId: userId, // Ensure to filter by userId
       },
     }),
     prisma.transaction.aggregate({
@@ -29,6 +30,7 @@ export async function getTransactionSummary() {
           gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
           lte: new Date(new Date().getFullYear(), currentMonth, 0),
         },
+        userId: userId, // Ensure to filter by userId
       },
     }),
     prisma.transaction.aggregate({
@@ -41,6 +43,7 @@ export async function getTransactionSummary() {
           gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
           lte: new Date(new Date().getFullYear(), currentMonth, 0),
         },
+        userId: userId, // Ensure to filter by userId
       },
     }),
   ]);

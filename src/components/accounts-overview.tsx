@@ -12,14 +12,21 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export async function AccountsOverview() {
-  const accounts = await prisma.account.findMany();
   const session = await getServerSession(authOptions);
-
   const userId = session?.user?.id; // Assicurati di avere l'ID utente dalla sessione
 
   if (!session || !userId) {
     return <div>Accesso negato</div>;
   }
+
+  const accounts = await prisma.account.findMany({
+    where: {
+      userId: userId || undefined, // Usa l'ID utente dalla sessione
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   const { totalValue, cashBalance } = await getInvestmentsData(userId);
 
@@ -34,34 +41,40 @@ export async function AccountsOverview() {
         <CardDescription>Panoramica dei tuoi conti finanziari</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {accounts.map((account) => (
-            <div
-              key={account.id}
-              className="flex items-center justify-between rounded-lg border p-4"
-            >
-              <div>
-                <div className="font-medium">{account.name}</div>
-                <div className="text-sm text-muted-foreground">
+        {accounts.length > 0 ? (
+          <div className="space-y-4">
+            {accounts.map((account) => (
+              <div
+                key={account.id}
+                className="flex items-center justify-between rounded-lg border p-4"
+              >
+                <div>
+                  <div className="font-medium">{account.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {account.type === "CHECKING"
+                      ? "Conto Corrente"
+                      : "Conto Titoli"}
+                  </div>
+                </div>
+                <div className="font-medium">
                   {account.type === "CHECKING"
-                    ? "Conto Corrente"
-                    : "Conto Titoli"}
+                    ? formatCurrency(Number(account.balance))
+                    : formatCurrency(totalValue)}
                 </div>
               </div>
-              <div className="font-medium">
-                {account.type === "CHECKING"
-                  ? formatCurrency(Number(account.balance))
-                  : formatCurrency(totalValue)}
+            ))}
+            <div className="flex items-center justify-between rounded-lg bg-muted p-4">
+              <div className="font-medium">Patrimonio Totale</div>
+              <div className="text-lg font-bold">
+                {formatCurrency(totalBalance + totalValue - cashBalance)}
               </div>
             </div>
-          ))}
-          <div className="flex items-center justify-between rounded-lg bg-muted p-4">
-            <div className="font-medium">Patrimonio Totale</div>
-            <div className="text-lg font-bold">
-              {formatCurrency(totalBalance + totalValue - cashBalance)}
-            </div>
           </div>
-        </div>
+        ) : (
+          <div className="text-center text-muted-foreground">
+            Nessun conto trovato. Aggiungi un conto per iniziare.
+          </div>
+        )}
       </CardContent>
     </Card>
   );

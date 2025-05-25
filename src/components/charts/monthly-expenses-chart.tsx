@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export function MonthlyChart({
+export function MonthlyExpensesChart({
   data,
 }: {
   data: { name: string; expenses: number; transfers: number }[];

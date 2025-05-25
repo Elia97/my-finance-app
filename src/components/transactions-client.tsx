@@ -15,6 +15,10 @@ export function TransactionsClient({ transactions }: TransactionsClientProps) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState<TransactionType | "all">("all");
   const [categoryId, setCategoryId] = useState<string | "all">("all");
+  const [dateFilter, setDateFilter] = useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({ startDate: null, endDate: null });
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
@@ -25,10 +29,13 @@ export function TransactionsClient({ transactions }: TransactionsClientProps) {
       const matchesType = type === "all" || tx.type === type;
       const matchesCategory =
         categoryId === "all" || tx.categoryId === categoryId;
+      const matchesDate =
+        (!dateFilter.startDate || new Date(tx.date) >= dateFilter.startDate) &&
+        (!dateFilter.endDate || new Date(tx.date) <= dateFilter.endDate);
 
-      return matchesSearch && matchesType && matchesCategory;
+      return matchesSearch && matchesType && matchesCategory && matchesDate;
     });
-  }, [transactions, search, type, categoryId]);
+  }, [transactions, search, type, categoryId, dateFilter]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -40,6 +47,8 @@ export function TransactionsClient({ transactions }: TransactionsClientProps) {
         setType={setType}
         categoryId={categoryId}
         setCategoryId={setCategoryId}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
       />
       <TransactionsTable transactions={filteredTransactions} />
     </div>

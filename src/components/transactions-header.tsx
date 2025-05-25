@@ -13,13 +13,13 @@ export function TransactionsHeader() {
     useState(false);
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
+      <div className="text-center md:text-left">
         <h1 className="text-3xl font-bold">Transazioni</h1>
         <p className="text-muted-foreground">
           Gestisci e visualizza tutte le tue transazioni
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 justify-center">
         <Button
           className="gap-2"
           onClick={() => setUploadExpensesDialogOpen(true)}

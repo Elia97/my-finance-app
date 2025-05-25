@@ -13,18 +13,41 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export async function AccountStats() {
-  const { totalBalance, totalIncome, totalExpenses, totalTransfers } =
-    await getAccountStats();
-
   const session = await getServerSession(authOptions);
-
   const userId = session?.user?.id; // Assicurati di avere l'ID utente dalla sessione
 
   if (!session || !userId) {
     return <div>Accesso negato</div>;
   }
 
+  const { totalBalance, totalIncome, totalExpenses, totalTransfers } =
+    await getAccountStats(userId);
   const { investedAmount, totalReturn } = await getInvestmentsData(userId);
+
+  if (
+    !totalBalance &&
+    !totalIncome &&
+    !totalExpenses &&
+    !totalTransfers &&
+    !investedAmount &&
+    !totalReturn
+  ) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Statistiche Conti</CardTitle>
+          <CardDescription>Nessuna informazione disponibile</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground">
+            Non hai ancora aggiunto transazioni o investimenti. Inizia creando
+            un nuovo conto o aggiungendo transazioni.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

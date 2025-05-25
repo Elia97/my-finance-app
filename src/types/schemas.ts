@@ -20,6 +20,15 @@ export const investmentTransactionSchema = z.object({
   transactionType: z.enum(["BUY", "SELL"]),
 });
 
+export const accountSchema = z.object({
+  name: z.string().min(1, "Il nome è obbligatorio"),
+  balance: z.coerce.number().optional(),
+  type: z.enum(["CHECKING", "INVESTMENT"]),
+  userId: z.string().min(1, "L'ID utente è obbligatorio"),
+  currency: z.string().optional(),
+  number: z.string().optional(),
+});
+
 export const loginSchema = z.object({
   email: z.string().email({ message: "Inserisci un'email valida" }),
   password: z.string().min(1, { message: "La password è obbligatoria" }),
@@ -34,5 +43,6 @@ export type TransactionFormData = z.infer<typeof transactionSchema>;
 export type InvestmentTransactionFormData = z.infer<
   typeof investmentTransactionSchema
 >;
+export type AccountFormData = z.infer<typeof accountSchema>;
 export type UpdatePriceFormData = z.infer<typeof updatePriceSchema>;
 export type LoginFormData = z.infer<typeof loginSchema>;

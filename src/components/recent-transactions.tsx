@@ -10,8 +10,17 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { ArrowDownRight, ArrowUpRight, RefreshCw } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function RecentTransactions() {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+
+  if (!session || !userId) {
+    return <div>Accesso negato</div>;
+  }
+
   const transactions = await prisma.transaction.findMany({
     take: 4, // Prende solo le ultime 4
     orderBy: {
@@ -23,7 +32,26 @@ export async function RecentTransactions() {
       user: true,
       category: true,
     },
+    where: {
+      userId: userId, // Filtra per l'ID dell'utente
+    },
   });
+
+  if (transactions.length === 0) {
+    return (
+      <Card className="col-span-2 lg:col-span-1">
+        <CardHeader>
+          <CardTitle>Transazioni Recenti</CardTitle>
+          <CardDescription>Nessuna transazione trovata</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground">
+            Non hai effettuato transazioni.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="col-span-2 lg:col-span-1">
