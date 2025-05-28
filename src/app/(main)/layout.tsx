@@ -20,7 +20,7 @@ export default function MainLayout({
           <div className="absolute top-2 left-2 z-10">
             <SidebarTrigger />
           </div>
-          <div className="w-full px-4 py-8 md:px-8 md:py-12">{children}</div>
+          <div className="w-full px-4 py-12 md:px-8">{children}</div>
           <div className="absolute top-2 right-2">
             <ThemeToggle />
           </div>

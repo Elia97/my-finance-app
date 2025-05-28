@@ -21,14 +21,14 @@ export function TransactionsHeader() {
       </div>
       <div className="flex flex-wrap gap-2 justify-center">
         <Button
-          className="gap-2"
+          className="w-full md:w-auto"
           onClick={() => setUploadExpensesDialogOpen(true)}
         >
           <PlusCircle className="h-4 w-4" />
           Importa transazioni
         </Button>
         <Button
-          className="gap-2"
+          className="w-full md:w-auto"
           onClick={() => setAddTransactionDialogOpen(true)}
         >
           <PlusCircle className="h-4 w-4" />

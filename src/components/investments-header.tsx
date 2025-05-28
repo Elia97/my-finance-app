@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Download, Calendar } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { AddInvestmentTransactionDialog } from "@/components/add-investment-transaction-dialog";
+import { AddInvestmentDialog } from "./add-investment-dialog";
 
 export function InvestmentsHeader() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [
+    isAddInvestmentTransactionDialogOpen,
+    setIsAddInvestmentTransactionDialogOpen,
+  ] = useState(false);
+  const [isAddInvestmentDialogOpen, setIsAddInvestmentDialogOpen] =
+    useState(false);
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between w-full">
       <div className="flex items-center justify-center gap-2">
@@ -17,31 +23,31 @@ export function InvestmentsHeader() {
           </p>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row items-center gap-2 mx-auto xl:mx-0">
-        <Button variant="outline" size="sm" className="w-full sm:w-auto">
-          <Calendar className="h-4 w-4" />
-          <span>Periodo</span>
-        </Button>
-        <Button variant="outline" size="sm" className="w-full sm:w-auto">
-          <Download className="h-4 w-4" />
-          <span>Esporta</span>
-        </Button>
+      <div className="flex flex-wrap items-center gap-2 xl:mx-0">
         <Button
           size="sm"
-          className="w-full sm:w-auto"
-          onClick={() => setIsDialogOpen(true)}
+          className="w-full md:w-auto"
+          onClick={() => setIsAddInvestmentTransactionDialogOpen(true)}
         >
           <PlusCircle className="h-4 w-4" />
           <span>Nuova Transazione</span>
         </Button>
-        <Button size="sm" className="w-full sm:w-auto">
+        <Button
+          size="sm"
+          className="w-full md:w-auto"
+          onClick={() => setIsAddInvestmentDialogOpen(true)}
+        >
           <PlusCircle className="h-4 w-4" />
           <span>Nuovo Asset</span>
         </Button>
         <AddInvestmentTransactionDialog
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-        ></AddInvestmentTransactionDialog>
+          open={isAddInvestmentTransactionDialogOpen}
+          onOpenChange={setIsAddInvestmentTransactionDialogOpen}
+        />
+        <AddInvestmentDialog
+          open={isAddInvestmentDialogOpen}
+          onOpenChange={setIsAddInvestmentDialogOpen}
+        />
       </div>
     </div>
   );

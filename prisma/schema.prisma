@@ -14,11 +14,21 @@ model User {
   password               String
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
+  preferences            UserPreferences?
   accounts               Account[]
   investments            Investment[]            @relation("UserInvestments")
   investmentTransactions InvestmentTransaction[]
   transactions           Transaction[]
   categories             Category[]
+}
+
+model UserPreferences {
+  id              String  @id @default(uuid())
+  userId          String  @unique
+  balanceAlerts   Boolean @default(true)
+  budgetAlerts    Boolean @default(true)
+  marketingEmails Boolean @default(false)
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -54,34 +64,35 @@ model Transaction {
 }
 
 model Investment {
-  id            String                  @id @default(uuid())
-  name          String
-  type          InvestmentType
-  quantity      Decimal
-  purchasePrice Decimal
-  currentPrice  Decimal
-  currency      String                  @default("EUR")
-  accountId     String
-  userId        String
-  startDate     DateTime
-  createdAt     DateTime                @default(now())
-  updatedAt     DateTime                @updatedAt
-  account       Account                 @relation(fields: [accountId], references: [id])
-  user          User                    @relation("UserInvestments", fields: [userId], references: [id])
-  transactions  InvestmentTransaction[]
+  id           String                  @id @default(uuid())
+  name         String
+  type         InvestmentType
+  quantity     Decimal
+  averagePrice Decimal                 @default(0.0) // prezzo medio ponderato
+  currentPrice Decimal
+  currency     String                  @default("EUR")
+  accountId    String
+  userId       String
+  startDate    DateTime
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  account      Account                 @relation(fields: [accountId], references: [id])
+  user         User                    @relation("UserInvestments", fields: [userId], references: [id])
+  transactions InvestmentTransaction[]
 }
 
 model InvestmentTransaction {
-  id           String                    @id @default(uuid())
-  type         InvestmentTransactionType
-  amount       Decimal
-  quantity     Decimal
-  price        Decimal
-  date         DateTime                  @default(now())
-  investmentId String
-  userId       String
-  investment   Investment                @relation(fields: [investmentId], references: [id])
-  user         User                      @relation(fields: [userId], references: [id])
+  id             String                    @id @default(uuid())
+  type           InvestmentTransactionType
+  amount         Decimal
+  quantity       Decimal
+  price          Decimal
+  realizedProfit Decimal? // solo per SELL
+  date           DateTime                  @default(now())
+  investmentId   String
+  userId         String
+  investment     Investment                @relation(fields: [investmentId], references: [id])
+  user           User                      @relation(fields: [userId], references: [id])
 }
 
 model Category {

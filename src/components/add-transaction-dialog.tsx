@@ -26,7 +26,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Account, Category } from "@/types/types";
-import { useSession } from "next-auth/react";
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -41,7 +40,6 @@ export function AddTransactionDialog({
   const [isPending, startTransition] = useTransition();
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const { data: session, status } = useSession();
   const {
     register,
     handleSubmit,
@@ -59,7 +57,6 @@ export function AddTransactionDialog({
       destinationAccountId: "",
       categoryId: "",
       transactionType: "EXPENSE",
-      userId: "",
     },
   });
   const transactionType = watch("transactionType");
@@ -120,14 +117,31 @@ export function AddTransactionDialog({
 
     fetchAccounts();
     fetchCategories();
+  }, []);
 
-    if (session?.user?.id) {
-      setValue("userId", session.user.id);
-    }
-  }, [session?.user?.id, setValue]);
-
-  if (status === "loading") {
-    return null; // oppure spinner
+  if (accounts.length === 0 || categories.length === 0) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Errore</DialogTitle>
+            <DialogDescription>
+              Non hai ancora configurato conti o categorie. Per favore, crea
+              prima un conto e una categoria.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant={"outline"}
+              onClick={() => router.push("/impostazioni?tab=categories")}
+            >
+              Crea una categoria
+            </Button>
+            <Button onClick={() => router.push("/conti")}>Vai ai Conti</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (

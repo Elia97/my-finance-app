@@ -28,7 +28,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 import { Investment } from "@/types/types";
 
 interface AddInvestmentTransactionDialogProps {
@@ -43,7 +42,6 @@ export function AddInvestmentTransactionDialog({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [investments, setInvestments] = useState<Investment[]>([]);
-  const { data: session, status } = useSession();
   const {
     register,
     handleSubmit,
@@ -54,11 +52,10 @@ export function AddInvestmentTransactionDialog({
   } = useForm<InvestmentTransactionFormData>({
     resolver: zodResolver(investmentTransactionSchema),
     defaultValues: {
-      quantity: undefined,
-      purchasePrice: undefined,
+      quantity: 0,
+      purchasePrice: 0,
       date: new Date().toISOString().split("T")[0],
       investmentId: "",
-      userId: "",
       transactionType: "BUY",
     },
   });
@@ -106,14 +103,22 @@ export function AddInvestmentTransactionDialog({
     };
 
     fetchInvestments();
+  }, []);
 
-    if (session?.user?.id) {
-      setValue("userId", session.user.id);
-    }
-  }, [session?.user?.id, setValue]);
-
-  if (status === "loading") {
-    return null; // oppure spinner
+  if (investments.length === 0) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Aggiungi Transazione</DialogTitle>
+            <DialogDescription>
+              Non hai ancora investimenti. Crea un investimento prima di
+              aggiungere una transazione.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (
@@ -135,7 +140,7 @@ export function AddInvestmentTransactionDialog({
                 val as InvestmentTransactionFormData["transactionType"]
               )
             }
-            className="grid grid-cols-3 gap-4"
+            className="grid grid-cols-2 gap-4"
           >
             {["BUY", "SELL"].map((type) => (
               <div key={type}>

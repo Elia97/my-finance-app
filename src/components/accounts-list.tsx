@@ -5,13 +5,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { CreditCard, Landmark } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getInvestmentsData } from "@/lib/queries/investments-data";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { UpdateAccount } from "./update-account";
+import { DeleteAccount } from "./delete-account";
 
 export async function AccountsList() {
   const session = await getServerSession(authOptions);
@@ -79,7 +80,8 @@ export async function AccountsList() {
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  {account.number?.slice(0, 4)}****{account.number?.slice(-4)}
+                  {account.number?.slice(0, 4)}****
+                  {account.number?.slice(-4)}
                 </div>
                 <div className="text-xl font-bold text-right">
                   {account.type === "CHECKING"
@@ -88,12 +90,8 @@ export async function AccountsList() {
                 </div>
               </div>
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" size="sm" className="flex-1">
-                  Modifica
-                </Button>
-                <Button variant={"destructive"} size="sm" className="flex-1">
-                  Elimina
-                </Button>
+                <UpdateAccount accountId={account.id} />
+                <DeleteAccount accountId={account.id} />
               </div>
             </div>
           ))}

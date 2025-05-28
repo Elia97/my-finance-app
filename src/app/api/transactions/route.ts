@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const userId = session.user.id;
   const body = await request.json();
   const {
     description,
@@ -11,7 +18,6 @@ export async function POST(request: NextRequest) {
     destinationAccountId,
     categoryId,
     transactionType,
-    userId,
   } = body;
 
   try {

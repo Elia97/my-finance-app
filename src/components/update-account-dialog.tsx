@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,18 +25,22 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
-interface AddAccountDialogProps {
+interface UpdateAccountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  accountId: string;
 }
 
-export function AddAccountDialog({
+export function UpdateAccountDialog({
   open,
   onOpenChange,
-}: AddAccountDialogProps) {
+  accountId,
+}: UpdateAccountDialogProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { data: session, status } = useSession();
   const {
     register,
     handleSubmit,
@@ -50,6 +54,7 @@ export function AddAccountDialog({
       name: "",
       balance: 0,
       type: "CHECKING",
+      userId: session?.user?.id || "",
       currency: "",
       number: "",
     },
@@ -57,17 +62,16 @@ export function AddAccountDialog({
   const accountType = watch("type");
 
   const onSubmit = async (data: AccountFormData) => {
-    setValue("type", accountType);
     try {
-      const res = await fetch("/api/accounts", {
-        method: "POST",
+      const res = await fetch(`/api/accounts/${accountId}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      toast.success("Conto creato", {
-        description: "Il conto è stato creato con successo",
+      toast.success("Conto modificato", {
+        description: "Il conto è stato modificato con successo",
       });
 
       startTransition(() => {
@@ -85,15 +89,42 @@ export function AddAccountDialog({
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      toast.error("Errore durante la creazione del conto", {
+      toast.error("Errore durante la modifica del conto", {
         description: errorMessage,
       });
     }
   };
 
+  useEffect(() => {
+    async function fetchAccount(accountId: string) {
+      try {
+        const res = await fetch(`/api/accounts/${accountId}`);
+        if (!res.ok) {
+          throw new Error("Errore nel recupero del conto");
+        }
+        const accountData: AccountFormData = await res.json();
+        reset(accountData);
+      } catch (error) {
+        toast.error("Errore durante il recupero del conto", {
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    if (session?.user?.id) {
+      setValue("userId", session.user.id);
+    }
+
+    fetchAccount(accountId);
+  }, [session?.user?.id, setValue, accountId, reset]);
+
+  if (status === "loading") {
+    return null; // oppure spinner
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] overflow-y-scroll">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Crea un nuovo conto</DialogTitle>
           <DialogDescription>
@@ -160,7 +191,10 @@ export function AddAccountDialog({
 
           <div className="grid gap-2">
             <Label>Conto</Label>
-            <Select onValueChange={(val) => setValue("currency", val)}>
+            <Select
+              value={watch("currency")}
+              onValueChange={(val) => setValue("currency", val)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona una valuta" />
               </SelectTrigger>

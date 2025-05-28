@@ -5,7 +5,7 @@ export async function PUT(
   request: NextRequest,
   context: { params: { id: string } }
 ) {
-  const params = await context.params; // await qui
+  const params = await context.params;
   const body = await request.json();
   const id = params.id;
   const { price } = body;

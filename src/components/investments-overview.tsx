@@ -22,6 +22,23 @@ export async function InvestmentsOverview() {
   const userId = session.user?.id; // Assicurati di avere l'ID utente dalla sessione
   const investmentsData = await getInvestmentsData(userId); // Replace with actual user ID
 
+  if (investmentsData.totalValue === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Panoramica Portafoglio</CardTitle>
+          <CardDescription>Nessun dato disponibile</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-muted-foreground">
+            Non hai ancora aggiunto investimenti. Inizia creando un nuovo
+            investimento.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="col-span-2 md:col-span-2 lg:col-span-2">
       <CardHeader>

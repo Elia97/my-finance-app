@@ -22,7 +22,7 @@ export async function getInvestmentsData(userId: string) {
       },
       select: {
         quantity: true,
-        purchasePrice: true,
+        averagePrice: true,
         currentPrice: true,
       },
     }),
@@ -35,7 +35,7 @@ export async function getInvestmentsData(userId: string) {
 
   for (const inv of investments) {
     const quantity = new Decimal(inv.quantity);
-    const purchase = new Decimal(inv.purchasePrice);
+    const purchase = new Decimal(inv.averagePrice);
     const current = new Decimal(inv.currentPrice);
 
     investedAmount = investedAmount.plus(quantity.times(purchase));

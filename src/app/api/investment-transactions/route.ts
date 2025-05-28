@@ -1,22 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const userId = session.user.id;
   const body = await request.json();
-  const {
-    quantity,
-    purchasePrice,
-    date,
-    investmentId,
-    transactionType,
-    userId,
-  } = body;
+  const { quantity, purchasePrice, date, investmentId, transactionType } = body;
 
   try {
     // Step 1: Recupera l'investimento e ottieni l'accountId
     const investment = await prisma.investment.findUnique({
       where: { id: investmentId },
-      select: { accountId: true },
+      select: { accountId: true, quantity: true, averagePrice: true },
     });
 
     if (!investment) {
@@ -42,6 +42,22 @@ export async function POST(request: NextRequest) {
     // Step 3: Aggiorna il bilancio dell'account
     const balanceUpdate = purchasePrice * quantity;
     if (transactionType === "BUY") {
+      const previousQuantity = investment.quantity ?? 0;
+      const previousAveragePrice = investment.averagePrice ?? 0;
+      console.log("Previous Quantity:", previousQuantity);
+      console.log("Previous Average Price:", previousAveragePrice);
+
+      const newTotalQuantity = Number(previousQuantity) + Number(quantity);
+      console.log("New Total Quantity:", newTotalQuantity);
+
+      const newAveragePrice =
+        newTotalQuantity === 0
+          ? 0
+          : (Number(previousQuantity) * Number(previousAveragePrice) +
+              quantity * purchasePrice) /
+            newTotalQuantity;
+      console.log("New Average Price:", newAveragePrice);
+
       await prisma.account.update({
         where: { id: investment.accountId },
         data: {
@@ -57,6 +73,7 @@ export async function POST(request: NextRequest) {
           quantity: {
             increment: quantity,
           },
+          averagePrice: newAveragePrice,
         },
       });
     } else {

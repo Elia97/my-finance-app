@@ -23,6 +23,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { signOut } from "next-auth/react";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -35,6 +37,8 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
 
   return (
     <div className="relative">
@@ -43,7 +47,7 @@ export function Sidebar() {
           <div className="flex h-16 items-center px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Wallet className="h-6 w-6" />
-              <span>Gestione Spese</span>
+              <span>gestisco.io</span>
             </Link>
           </div>
         </SidebarHeader>
@@ -59,6 +63,12 @@ export function Sidebar() {
                   <Link
                     href={item.href}
                     className="flex items-center gap-3 px-4 py-2"
+                    onClick={() => {
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      }
+                    }}
+                    aria-label={item.name}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.name}</span>

@@ -18,7 +18,10 @@ export function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-2 justify-center">
-        <Button onClick={() => setIsDialogOpen(true)} className="gap-2">
+        <Button
+          onClick={() => setIsDialogOpen(true)}
+          className="w-full md:w-auto"
+        >
           <PlusCircle className="h-4 w-4" />
           Nuova Transazione
         </Button>
