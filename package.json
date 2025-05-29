@@ -10,7 +10,8 @@
     "lint": "next lint",
     "reset-and-seed": "npx prisma migrate reset --force && npx ts-node prisma/seed.ts",
     "test": "cross-env NODE_ENV=test dotenv -e .env.test -- jest",
-    "studio:test": "dotenv -e .env.test -- npx prisma studio"
+    "studio:test": "dotenv -e .env.test -- npx prisma studio",
+    "postinstall": "prisma generate"
   },
   "overrides": {
     "cookie": "^0.7.0"
