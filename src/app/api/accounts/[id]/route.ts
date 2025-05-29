@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const accountId = params.id;
+interface Params {
+  params: { id: string };
+}
+
+export async function GET(request: Request, context: Params) {
+  const { id: accountId } = context.params;
 
   try {
     const account = await prisma.account.findUnique({
@@ -29,11 +30,8 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const accountId = params.id;
+export async function PUT(request: Request, context: Params) {
+  const { id: accountId } = context.params;
   const data = await request.json();
 
   try {
@@ -52,11 +50,8 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const accountId = params.id;
+export async function DELETE(request: Request, context: Params) {
+  const { id: accountId } = context.params;
 
   try {
     await prisma.account.delete({
