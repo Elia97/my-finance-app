@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-interface Params {
-  params: { id: string };
-}
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const accountId = url.pathname.split("/").pop();
 
-export async function GET(request: Request, context: Params) {
-  const { id: accountId } = context.params;
-
+  if (!accountId) {
+    return NextResponse.json({ error: "ID missing" }, { status: 400 });
+  }
   try {
     const account = await prisma.account.findUnique({
       where: { id: accountId },
@@ -30,8 +30,13 @@ export async function GET(request: Request, context: Params) {
   }
 }
 
-export async function PUT(request: Request, context: Params) {
-  const { id: accountId } = context.params;
+export async function PUT(request: Request) {
+  const url = new URL(request.url);
+  const accountId = url.pathname.split("/").pop();
+
+  if (!accountId) {
+    return NextResponse.json({ error: "ID missing" }, { status: 400 });
+  }
   const data = await request.json();
 
   try {
@@ -50,8 +55,13 @@ export async function PUT(request: Request, context: Params) {
   }
 }
 
-export async function DELETE(request: Request, context: Params) {
-  const { id: accountId } = context.params;
+export async function DELETE(request: Request) {
+  const url = new URL(request.url);
+  const accountId = url.pathname.split("/").pop();
+
+  if (!accountId) {
+    return NextResponse.json({ error: "ID missing" }, { status: 400 });
+  }
 
   try {
     await prisma.account.delete({
