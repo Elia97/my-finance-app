@@ -9,9 +9,14 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const userId = session.user.id;
+  if (!userId) {
+    return NextResponse.json({ error: "User ID not found" }, { status: 400 });
+  }
+
   const accounts = await prisma.account.findMany({
     where: {
-      userId: session.user.id,
+      userId: userId,
     },
     orderBy: {
       createdAt: "desc",

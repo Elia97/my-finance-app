@@ -25,7 +25,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 interface UpdateAccountDialogProps {
   open: boolean;
@@ -40,7 +39,6 @@ export function UpdateAccountDialog({
 }: UpdateAccountDialogProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { data: session, status } = useSession();
   const {
     register,
     handleSubmit,
@@ -54,7 +52,6 @@ export function UpdateAccountDialog({
       name: "",
       balance: 0,
       type: "CHECKING",
-      userId: session?.user?.id || "",
       currency: "",
       number: "",
     },
@@ -111,16 +108,8 @@ export function UpdateAccountDialog({
       }
     }
 
-    if (session?.user?.id) {
-      setValue("userId", session.user.id);
-    }
-
     fetchAccount(accountId);
-  }, [session?.user?.id, setValue, accountId, reset]);
-
-  if (status === "loading") {
-    return null; // oppure spinner
-  }
+  }, [setValue, accountId, reset]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

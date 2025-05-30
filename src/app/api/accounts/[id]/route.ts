@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const accountId = url.pathname.split("/").pop();
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const accountId = params.id;
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = session.user.id;
+  if (!userId) {
+    return NextResponse.json({ error: "User ID not found" }, { status: 400 });
+  }
 
   if (!accountId) {
     return NextResponse.json({ error: "ID missing" }, { status: 400 });
   }
+
   try {
     const account = await prisma.account.findUnique({
       where: { id: accountId },
-      include: {
-        user: true,
-      },
+      include: { user: true },
     });
 
     if (!account) {
@@ -30,19 +43,30 @@ export async function GET(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
-  const url = new URL(request.url);
-  const accountId = url.pathname.split("/").pop();
-
+export async function PUT(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const accountId = params.id;
   if (!accountId) {
     return NextResponse.json({ error: "ID missing" }, { status: 400 });
   }
-  const data = await request.json();
+
+  const body = await request.json();
+
+  const { name, balance, type, currency, number } = body;
 
   try {
     const updatedAccount = await prisma.account.update({
       where: { id: accountId },
-      data,
+      data: {
+        name,
+        balance,
+        type,
+        currency,
+        number,
+      },
     });
 
     return NextResponse.json(updatedAccount);
@@ -55,9 +79,12 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
-  const url = new URL(request.url);
-  const accountId = url.pathname.split("/").pop();
+export async function DELETE(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const accountId = params.id;
 
   if (!accountId) {
     return NextResponse.json({ error: "ID missing" }, { status: 400 });

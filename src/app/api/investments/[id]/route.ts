@@ -3,11 +3,11 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const params = await context.params;
-  const body = await request.json();
   const id = params.id;
+  const body = await request.json();
   const { price } = body;
 
   if (!price) {
