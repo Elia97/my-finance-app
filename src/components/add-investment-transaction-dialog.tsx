@@ -164,7 +164,7 @@ export function AddInvestmentTransactionDialog({
             <Input
               id="quantity"
               type="number"
-              step="0.01"
+              step="0.00000001"
               {...register("quantity")}
             />
             {errors.quantity && (
@@ -177,7 +177,7 @@ export function AddInvestmentTransactionDialog({
             <Input
               id="purchasePrice"
               type="number"
-              step="0.01"
+              step="0.00000001"
               {...register("purchasePrice")}
             />
             {errors.purchasePrice && (

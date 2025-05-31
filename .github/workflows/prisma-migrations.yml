@@ -21,8 +21,3 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: npx prisma migrate deploy
-      - name: Run seed
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          npx ts-node prisma/seed.ts || (echo "Seeding failed" && exit 1)
