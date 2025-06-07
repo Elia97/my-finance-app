@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Account, Category } from "@/types/types";
+import { Account, Category } from "@prisma/client";
 
 interface AddTransactionDialogProps {
   open: boolean;
@@ -60,6 +60,7 @@ export function AddTransactionDialog({
     },
   });
   const transactionType = watch("transactionType");
+  const selectedSourceAccountId = watch("sourceAccountId");
 
   const onSubmit = async (data: TransactionFormData) => {
     if (transactionType === "TRANSFER") {
@@ -118,6 +119,13 @@ export function AddTransactionDialog({
     fetchAccounts();
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const defaultAccount = accounts.find((acc) => acc.type === "CHECKING");
+    if (defaultAccount) {
+      setValue("sourceAccountId", defaultAccount.id);
+    }
+  }, [accounts, setValue]);
 
   if (accounts.length === 0 || categories.length === 0) {
     return (
@@ -218,16 +226,21 @@ export function AddTransactionDialog({
 
           <div className="grid gap-2">
             <Label>Conto</Label>
-            <Select onValueChange={(val) => setValue("sourceAccountId", val)}>
+            <Select
+              onValueChange={(val) => setValue("sourceAccountId", val)}
+              value={selectedSourceAccountId}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Seleziona un conto" />
               </SelectTrigger>
               <SelectContent>
-                {accounts.map((acc) => (
-                  <SelectItem key={acc.id} value={acc.id}>
-                    {acc.name}
-                  </SelectItem>
-                ))}
+                {accounts
+                  .filter((acc) => acc.type === "CHECKING")
+                  .map((acc) => (
+                    <SelectItem key={acc.id} value={acc.id}>
+                      {acc.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {errors.sourceAccountId && (
