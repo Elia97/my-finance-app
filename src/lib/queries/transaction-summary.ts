@@ -1,49 +1,37 @@
 import { prisma } from "../prisma";
 import { TransactionType } from "@prisma/client";
 
-export async function getTransactionSummary(userId: string) {
-  // Get the current month
-  const currentMonth = new Date().getMonth() + 1;
+export async function getTransactionSummary(
+  userId: string,
+  year: number,
+  month: number
+) {
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 0, 23, 59, 59); // fine mese
 
-  // Get transactions for the current month
   const [income, expenses, transfers] = await Promise.all([
     prisma.transaction.aggregate({
-      _sum: {
-        amount: true,
-      },
+      _sum: { amount: true },
       where: {
         type: TransactionType.INCOME,
-        date: {
-          gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-          lte: new Date(new Date().getFullYear(), currentMonth, 0),
-        },
-        userId: userId, // Ensure to filter by userId
+        date: { gte: startDate, lte: endDate },
+        userId,
       },
     }),
     prisma.transaction.aggregate({
-      _sum: {
-        amount: true,
-      },
+      _sum: { amount: true },
       where: {
         type: TransactionType.EXPENSE,
-        date: {
-          gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-          lte: new Date(new Date().getFullYear(), currentMonth, 0),
-        },
-        userId: userId, // Ensure to filter by userId
+        date: { gte: startDate, lte: endDate },
+        userId,
       },
     }),
     prisma.transaction.aggregate({
-      _sum: {
-        amount: true,
-      },
+      _sum: { amount: true },
       where: {
         type: TransactionType.TRANSFER,
-        date: {
-          gte: new Date(new Date().getFullYear(), currentMonth - 1, 1),
-          lte: new Date(new Date().getFullYear(), currentMonth, 0),
-        },
-        userId: userId, // Ensure to filter by userId
+        date: { gte: startDate, lte: endDate },
+        userId,
       },
     }),
   ]);
