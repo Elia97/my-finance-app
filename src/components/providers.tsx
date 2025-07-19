@@ -5,7 +5,10 @@ import { ThemeProvider } from "./theme-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider
+      refetchInterval={5 * 60} // Ricontrolla la sessione ogni 5 minuti
+      refetchOnWindowFocus={true} // Ricontrolla quando la finestra torna in focus
+    >
       <ThemeProvider
         attribute="class"
         defaultTheme="system"

@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { loginSchema, type LoginFormData } from "@/types/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/form";
 
 export default function LoginPage() {
-  const router = useRouter();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -28,16 +26,33 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values: LoginFormData) => {
-    const res = await signIn("credentials", {
-      ...values,
-      redirect: false,
-    });
+    try {
+      const res = await signIn("credentials", {
+        ...values,
+        redirect: false,
+      });
 
-    if (res?.ok) {
-      router.push("/");
-    } else {
-      form.setError("password", {
-        message: "Email o password non validi",
+      if (res?.error) {
+        if (res.error === "CredentialsSignin") {
+          form.setError("root", {
+            message: "Email o password non validi",
+          });
+        } else {
+          form.setError("root", {
+            message: "Errore durante l'accesso. Riprova.",
+          });
+        }
+        return;
+      }
+
+      if (res?.ok) {
+        // Reindirizza alla homepage
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      form.setError("root", {
+        message: "Errore di rete. Controlla la connessione.",
       });
     }
   };
