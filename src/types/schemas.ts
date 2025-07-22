@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const transactionSchema = z.object({
+  id: z.string().optional(),
   description: z.string().min(1, "La descrizione è obbligatoria"),
   amount: z.coerce.number(),
   date: z.string().min(1, "La data è obbligatoria"),

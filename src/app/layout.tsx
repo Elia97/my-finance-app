@@ -1,4 +1,3 @@
-import type React from "react";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -10,16 +9,16 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Gestione Finanziaria Personale",
   description: "Applicazione per la gestione delle finanze personali",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "My Finance App",
   },
   formatDetection: {
-    telephone: false,
+    telephone: false, // Importante per app finanziarie (importi, codici non devono essere "chiamabili")
   },
   openGraph: {
+    // Social media metadata
     type: "website",
     siteName: "My Finance App",
     title: "Gestione Finanziaria Personale",
@@ -27,8 +26,9 @@ export const metadata: Metadata = {
   },
   icons: {
     shortcut: "/favicon.ico",
-    apple: [{ url: "/icon-192x192.png", sizes: "192x192", type: "image/png" }],
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {

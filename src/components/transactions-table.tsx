@@ -23,12 +23,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TransactionWithRelations } from "@/types/types";
+import type { Transaction } from "@prisma/client";
+import { useState } from "react";
+import { UpdateTransactionDialog } from "./update-transaction-dialog";
+import { DeleteTransactionDialog } from "./delete-transaction-dialog";
 
-export function TransactionsTable({
-  transactions,
-}: {
+interface TransactionsTableProps {
   transactions: TransactionWithRelations[];
-}) {
+}
+
+export function TransactionsTable({ transactions }: TransactionsTableProps) {
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleUpdateTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsUpdateDialogOpen(true);
+  };
+
+  const handleDeleteTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsDeleteDialogOpen(true);
+  };
+
   if (!transactions || transactions.length === 0) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -122,8 +141,15 @@ export function TransactionsTable({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Modifica</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
+                    <DropdownMenuItem
+                      onClick={() => handleUpdateTransaction(transaction)}
+                    >
+                      Modifica
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDeleteTransaction(transaction)}
+                    >
                       Elimina
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -133,6 +159,20 @@ export function TransactionsTable({
           ))}
         </TableBody>
       </Table>
+      {isUpdateDialogOpen && selectedTransaction && (
+        <UpdateTransactionDialog
+          transaction={selectedTransaction}
+          open={isUpdateDialogOpen}
+          onOpenChange={setIsUpdateDialogOpen}
+        />
+      )}
+      {isDeleteDialogOpen && selectedTransaction && (
+        <DeleteTransactionDialog
+          transaction={selectedTransaction}
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+        />
+      )}
     </div>
   );
 }

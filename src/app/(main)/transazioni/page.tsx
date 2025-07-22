@@ -4,7 +4,7 @@ import { TransactionsClient } from "@/components/transactions-client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export default async function TransactionsPage() {
+export default async function TransactionsPage(): Promise<React.JSX.Element> {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
