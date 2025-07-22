@@ -9,16 +9,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Gestione Finanziaria Personale",
   description: "Applicazione per la gestione delle finanze personali",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "My Finance App",
-  },
   formatDetection: {
-    telephone: false, // Importante per app finanziarie (importi, codici non devono essere "chiamabili")
+    telephone: false,
   },
   openGraph: {
-    // Social media metadata
     type: "website",
     siteName: "My Finance App",
     title: "Gestione Finanziaria Personale",
@@ -26,9 +20,7 @@ export const metadata: Metadata = {
   },
   icons: {
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
   },
-  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {

@@ -19,13 +19,6 @@ export function SessionKeepAlive() {
       });
     }, 10 * 60 * 1000); // 10 minuti
 
-    // Service Worker per gestire la sessione anche quando l'app è in background
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
-        // Service worker registration failed, but continue anyway
-      });
-    }
-
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
