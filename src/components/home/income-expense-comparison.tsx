@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getMonthlyStats } from "@/lib/queries/monthly-stats";
-import { IncomeExpenseComparisonChart } from "./charts/income-expense-comparison-chart";
+import { IncomeExpenseComparisonChart } from "../charts/income-expense-comparison-chart";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 

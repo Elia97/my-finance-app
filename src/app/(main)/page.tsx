@@ -1,8 +1,11 @@
-import { DashboardHeader } from "@/components/dashboard-header";
-import { AccountsOverview } from "@/components/accounts-overview";
-import { RecentTransactions } from "@/components/recent-transactions";
-import { MonthlyExpenses } from "@/components/monthly-expenses";
-import TransactionSummary from "@/components/transaction-summary";
+import {
+  AccountsOverview,
+  DashboardHeader,
+  TransfersComparison,
+  TransactionsSummary,
+  IncomeExpenseComparison,
+  RecentTransactions,
+} from "@/components/home";
 
 export default function Home() {
   return (
@@ -10,11 +13,12 @@ export default function Home() {
       <DashboardHeader />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <AccountsOverview />
-        <TransactionSummary />
+        <TransactionsSummary />
       </div>
       <div className="grid gap-6 md:grid-cols-2">
-        <MonthlyExpenses />
+        <IncomeExpenseComparison />
         <RecentTransactions />
+        <TransfersComparison />
       </div>
     </div>
   );

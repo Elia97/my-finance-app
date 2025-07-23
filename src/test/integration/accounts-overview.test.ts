@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { AccountsOverview } from "@/components/accounts-overview";
+import { AccountsOverview } from "@/components/home/accounts-overview";
 import * as auth from "next-auth";
 import "@testing-library/jest-dom";
 
